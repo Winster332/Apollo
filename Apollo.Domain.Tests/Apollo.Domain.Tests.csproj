@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<IsPackable>false</IsPackable>
+		<RootNamespace>Apollo.Domain.Tests</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="EventFlow.MongoDB" Version="0.80.4377" />
+		<PackageReference Include="NUnit" Version="3.12.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Apollo.Domain\Apollo.Domain.csproj" />
+	  <ProjectReference Include="..\Apollo.Infrastructure\Apollo.Infrastructure.csproj" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,48 @@
+﻿{
+    "compilerOptions": {
+        "removeComments": true,
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": false,
+        "noImplicitAny": true,
+        "noUnusedParameters": true,
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "incremental": true,
+        "strictPropertyInitialization": true,
+        "noUnusedLocals": true,
+        "useDefineForClassFields": true,
+        "forceConsistentCasingInFileNames": true,
+        "target": "es5",
+        "lib": [ "es6", "dom" ],
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "allowJs": true,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "paths": {
+            "@Shared/*": ["./Shared/*"],
+            "@Layout": ["./Layout/index.ts"]
+        }
+    },
+    "compileOnSave": false,
+    "include": [
+        "index.ts",
+        // Явно включим папки, чтобы в них работал интеллисенс до использования файлов в проекте
+        "Apps/**/*.ts",
+        "Apps/**/*.tsx",
+        "Shared/**/*.ts",
+        "Shared/**/*.tsx",
+        "Layout/**/*.ts",
+        "Layout/**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "Typings/proschet.d.ts",
+        "Typings/styled-components.d.ts",
+        "Typings/webpack-plugins.d.ts"
+    ]
+}

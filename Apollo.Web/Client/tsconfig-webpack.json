@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "baseUrl": ".",
+    },
+    "compileOnSave": false,
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "Typings/webpack-plugins.d.ts"
+    ]
+}

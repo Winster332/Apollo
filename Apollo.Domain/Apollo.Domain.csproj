@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Apollo.Domain</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="EPPlus" Version="5.4.1" />
+	  <PackageReference Include="EventFlow" Version="0.80.4377" />
+	  <PackageReference Include="EventFlow.MongoDB" Version="0.80.4377" />
+	  <PackageReference Include="Flurl.Http" Version="3.0.0" />
+	  <PackageReference Include="Functional.Maybe" Version="2.0.20" />
+	  <PackageReference Include="Hangfire.Console" Version="1.4.2" />
+	  <PackageReference Include="Hangfire.Core" Version="1.7.25" />
+	  <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
+	  <PackageReference Include="ImageProcessorNet5.Plugins.WebP" Version="1.0.0" />
+	  <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.14" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
+	  <PackageReference Include="morelinq" Version="3.3.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="BootstrapImport\Интернет-обращения.xlsx" />
+	  <Content Include="BootstrapImport\Интернет-обращения.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\Категории.xlsx" />
+	  <Content Include="BootstrapImport\Категории.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\МКД_Невского_р-на.xlsx" />
+	  <Content Include="BootstrapImport\МКД_Невского_р-на.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\Отет для загрузки 1.xlsx" />
+	  <Content Include="BootstrapImport\Отет для загрузки 1.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\Отчет ВК.xlsx" />
+	  <Content Include="BootstrapImport\Отчет ВК.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\ОТЧЕТ ПО БЕГЛОВУ.xlsx" />
+	  <Content Include="BootstrapImport\ОТЧЕТ ПО БЕГЛОВУ.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="BootstrapImport\МКД_Невского_р-на без доп домов.xlsx" />
+	  <Content Include="BootstrapImport\МКД_Невского_р-на без доп домов.xlsx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+</Project>
