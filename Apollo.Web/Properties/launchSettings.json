@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Alteriko.Web": {
+    "Apollo.Web": {
       "commandName": "Project",
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7501;http://localhost:7500",
