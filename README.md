@@ -14,12 +14,18 @@ HTTPS clone URL: https://git.jetbrains.space/sm/apollo/Apollo.git
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-## Prerequisites
+## How build
 
-What things you need to install the software and how to install them.
-
+Build backend
 ```
-Examples
+cd Apollo.Web
+dotnet build --configuration Project
+dotnet run
+```
+Build backend
+```
+yarn install
+yarn watch
 ```
 
 ## Deployment
