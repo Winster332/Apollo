@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  mongo1:
+    hostname: mongo
+    container_name: mongo
+    image: mongo:4.4
+    volumes:
+      - ./data/db:/data/db
+      - ./data/configdb:/data/configdb
+    networks:
+      - apollo-net-ext
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--port", "30001" ]
+
+networks:
+    apollo-net-ext:
+        external:
+            name: super-test
