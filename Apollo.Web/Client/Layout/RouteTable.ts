@@ -79,7 +79,7 @@ export class RouteTable {
 			new RouteGroup(
 				'Основное',
 				true,
-				ApplicationController.list(25)
+				ApplicationController.list()
 					.route('Заявки', true)
 					.useCounter(CounterNames.ApplicationsList),
 				AddressController.list(25)

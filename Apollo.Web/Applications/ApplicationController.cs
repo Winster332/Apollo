@@ -34,11 +34,11 @@ namespace Apollo.Web.Applications
 		}
 		
 		[AccessEndpoint(RoleAccess.ApplicationList)]
-		public Task<TypedResult<ApplicationsListAppSettings>> List(int size) => Authenticated(async () =>
+		public Task<TypedResult<ApplicationsListAppSettings>> List() => Authenticated(async () =>
 		{
 			var ct = HttpContext.RequestAborted;
 			var searchResultApplicationViews = await QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(0, size, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing), ct);
+				.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing), ct);
 			// var addressViews = await QueryProcessor.ProcessAsync(new ListAddressQuery(), CancellationToken.None);
 			// var applicationCategoryViews = await QueryProcessor.ProcessAsync(new ListApplicationCategoryQuery(), CancellationToken.None);
 			var applicationStateViews = await QueryProcessor.ProcessAsync(new ListApplicationStateQuery(), ct);

@@ -25,7 +25,7 @@ const AccountLoginApp = observer((_: IAccountLoginAppSettings) => {
 			})
 				.then(retVal => {
 					if (retVal) {
-						Router().href(ApplicationController.list(25));
+						Router().href(ApplicationController.list());
 					}
 				});
 		}
