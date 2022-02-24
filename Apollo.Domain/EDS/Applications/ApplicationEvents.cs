@@ -31,6 +31,7 @@ namespace Apollo.Domain.EDS.Applications
 			Maybe<string> apartmentNumber,
 			Maybe<ApplicationSourceId> sourceId,
 			Maybe<string> phoneNumber,
+			Maybe<string> answer,
 			BusinessCallContext context)
 			: base(context)
 		{
@@ -51,6 +52,7 @@ namespace Apollo.Domain.EDS.Applications
 			ApartmentNumber = apartmentNumber;
 			SourceId = sourceId;
 			PhoneNumber = phoneNumber;
+			Answer = answer;
 		}
 
 		public int ExternalId { get; }
@@ -70,6 +72,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<string> ApartmentNumber { get; }
 		public Maybe<ApplicationSourceId> SourceId { get; }
 		public Maybe<string> PhoneNumber { get; }
+		public Maybe<string> Answer { get; }
 	}
 	
 	public class ApplicationDescribed: BusinessAggregateEvent<Application, ApplicationId>

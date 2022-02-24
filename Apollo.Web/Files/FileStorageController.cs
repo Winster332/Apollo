@@ -1,9 +1,10 @@
+using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Apollo.Domain.Configuration;
 using Apollo.Domain.Files;
 using Apollo.Domain.SharedKernel;
-using Apollo.Web.Applications;
 using Apollo.Web.Infrastructure;
 using Apollo.Web.Infrastructure.React;
 using EventFlow;
@@ -32,14 +33,19 @@ namespace Apollo.Web.Files
 			var fileName = new FileName(parameters.File.FileName);
 			var nameAndExtension = fileName.Value.Split('.');
 			var extension = new FileExtension(nameAndExtension[1]);
-			var userId = ControllerContext.HttpContext.FindUserId();
+			var bytes = Array.Empty<byte>();
+
+			await using (var memStream = new MemoryStream())
+			{
+				await fileStream.CopyToAsync(memStream);
+				bytes = memStream.ToArray();
+			}
 
 			return await CommandBus.PublishAsync(new UpdateFile(
 				Maybe<FileId>.Nothing, 
 				fileName,
 				extension, 
-				fileStream,
-				userId), CancellationToken.None);
+				bytes), CancellationToken.None);
 		}
 	}
 }

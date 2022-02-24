@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Apollo.Domain.Configuration;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.Applications;
+using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.Extensions;
 using Apollo.Domain.SharedKernel;
@@ -21,7 +22,7 @@ namespace Apollo.Web.Applications
 	{
 		public Task<ActionResult<SearchResult<ApplicationView>>> List(ListApplicationPagedUiQuery query)
 			=> QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo))
+				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing))
 				.AsActionResult();
 		
 		// public async Task<ActionResult<ExecutionResult<int>>> CommitImport(CommitApplicationImportCommandUI cmd) =>
@@ -81,6 +82,18 @@ namespace Apollo.Web.Applications
 		public PrintApplicationReportResult(FileContentResult blob)
 		{
 			Blob = blob;
+		}
+	}
+	
+	public class GenerateDiffReportUiCommand
+	{
+		public DateTime From { get; }
+		public DateTime To { get; }
+
+		public GenerateDiffReportUiCommand(DateTime from, DateTime to)
+		{
+			From = from;
+			To = to;
 		}
 	}
 

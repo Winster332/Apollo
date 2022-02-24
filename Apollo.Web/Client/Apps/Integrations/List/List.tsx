@@ -295,7 +295,7 @@ const pulse = keyframes`
   }
 `
 
-const ActiveStageCircle = styled(Box)`
+export const ActiveStageCircle = styled(Box)`
 	width: 14px;
     height: 14px;
     border-radius: 50%;
@@ -305,7 +305,7 @@ const ActiveStageCircle = styled(Box)`
     z-index: 2;
 `
 
-const StageCircle = styled(Box)`
+export const StageCircle = styled(Box)`
 	width: 14px;
     height: 14px;
     border-radius: 50%;

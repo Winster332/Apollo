@@ -7,6 +7,7 @@ using Apollo.Domain.Configuration;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationCategories;
 using Apollo.Domain.EDS.Applications;
+using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.ApplicationStates;
 using Apollo.Domain.EDS.ApplicationTypes;
 using Apollo.Domain.Extensions;
@@ -37,7 +38,7 @@ namespace Apollo.Web.Applications
 		{
 			var ct = HttpContext.RequestAborted;
 			var searchResultApplicationViews = await QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(0, size, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing), ct);
+				.ProcessAsync(new ListApplicationsPagedQuery(0, size, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing), ct);
 			// var addressViews = await QueryProcessor.ProcessAsync(new ListAddressQuery(), CancellationToken.None);
 			// var applicationCategoryViews = await QueryProcessor.ProcessAsync(new ListApplicationCategoryQuery(), CancellationToken.None);
 			var applicationStateViews = await QueryProcessor.ProcessAsync(new ListApplicationStateQuery(), ct);

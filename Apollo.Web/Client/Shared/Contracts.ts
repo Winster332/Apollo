@@ -120,6 +120,7 @@ export interface IUsersListAppSettings
 	equalityContract: any;
 	userViews: IUserView[];
 	roleViews: IRoleView[];
+	employeeViews: IEmployeeView[];
 }
 /** Result of ApiControllerProxyGenerator activity */
 export class RoleApiControllerProxy
@@ -204,6 +205,24 @@ export class ReportApiControllerProxy
 		return this.http.post('/api/ReportApi/FilterApplications', params)
 			.then((response: { data: any }) => { return fromServer(response.data) as ISearchResult<IApplicationView>; });
 	}
+	public diffReportApplicationList(query: IListApplicationPagedUiQuery) : Promise<ISearchResult<IApplicationView>>
+	{
+		const params = { 'query': fromClient(query) };
+		return this.http.post('/api/ReportApi/DiffReportApplicationList', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as ISearchResult<IApplicationView>; });
+	}
+	public diffReportList(query: IListApplicationPagedUiQuery) : Promise<ISearchResult<IDiffReportView>>
+	{
+		const params = { 'query': fromClient(query) };
+		return this.http.post('/api/ReportApi/DiffReportList', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as ISearchResult<IDiffReportView>; });
+	}
+	public generateDiffReport(query: IGenerateDiffReportUiCommand) : Promise<IExecutionResult<IDiffReportView>>
+	{
+		const params = { 'query': fromClient(query) };
+		return this.http.post('/api/ReportApi/GenerateDiffReport', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as IExecutionResult<IDiffReportView>; });
+	}
 	public byOrganizationsPrintReport(q: IPrintApplicationOrganizationsReportCommandUI) : Promise<IPrintReportResult>
 	{
 		const params = { 'q': fromClient(q) };
@@ -243,12 +262,23 @@ export class ReportController
 			{}
 		);
 	}
-	public static fromG() : LocationDescriptor<'ReportsFromGApp'>
+	public static differenceReport(id: string) : LocationDescriptor<'ReportsDifferenceReportApp'>
 	{
 		return new LocationDescriptor(
-			'ReportsFromGApp',
+			'ReportsDifferenceReportApp',
 			'roleaccess-00000000-0000-0000-0000-000000000010',
-			'/report/fromg',
+			'/report/differencereport',
+			{
+				id: id
+			}
+		);
+	}
+	public static differenceList() : LocationDescriptor<'ReportsDifferenceListApp'>
+	{
+		return new LocationDescriptor(
+			'ReportsDifferenceListApp',
+			'roleaccess-00000000-0000-0000-0000-000000000010',
+			'/report/differencelist',
 			{}
 		);
 	}
@@ -289,9 +319,16 @@ export interface IReportsFromAdsAppSettings
 	addressViews: IAddressView[];
 	organizationViews: IOrganizationView[];
 }
-export interface IReportsFromGAppSettings
+export interface IReportsDifferenceReportAppSettings
 {
 	equalityContract: any;
+	reportView: IDiffReportView;
+	applicationViews: IApplicationView[];
+}
+export interface IReportsDifferenceListAppSettings
+{
+	equalityContract: any;
+	searchResultReportViews: ISearchResult<IDiffReportView>;
 }
 export interface IReportsApplicationsByOrganizationsAppSettings
 {
@@ -585,6 +622,11 @@ export interface IFilterApplicationPagedUiQuery
 	year: (number | null);
 	month: (number | null);
 }
+export interface IGenerateDiffReportUiCommand
+{
+	from: dayjs.Dayjs;
+	to: dayjs.Dayjs;
+}
 export interface IPrintApplicationReportCommandUI
 {
 }
@@ -596,6 +638,8 @@ export interface IApplicationsListAppSettings
 {
 	equalityContract: any;
 	applicationViews: ISearchResult<IApplicationView>;
+	stateViews: IApplicationStateView[];
+	typeViews: IApplicationTypeView[];
 	applicationsDiagram: ILineDiagramDate<dayjs.Dayjs>[];
 }
 /** Result of ApiControllerProxyGenerator activity */
@@ -927,6 +971,86 @@ export interface IMongoDbReadModel
 	id: string;
 	version: number;
 }
+export interface IDiffReportFilter extends IValueObject
+{
+	from: dayjs.Dayjs;
+	to: dayjs.Dayjs;
+}
+export interface IDiffReportApplication extends IValueObject
+{
+	applicationId: string;
+	before: IDiffReportBefore;
+	after: IDiffReportAfter;
+	error: (string | null);
+}
+export interface IDiffReportBefore extends IValueObject
+{
+	photoIds: IFileMeta[];
+}
+export interface IFileMeta extends IValueObject
+{
+	url: string;
+	fileName: string;
+}
+export interface IDiffReportAfter extends IValueObject
+{
+	fileIds: IFileMeta[];
+	photoIds: IFileMeta[];
+}
+export interface IDiffReportView extends IMongoDbReadModel
+{
+	diffs: IDiffReportApplication[];
+	dateTimeStarted: dayjs.Dayjs;
+	dateTimeFinished: (dayjs.Dayjs | null);
+	filter: IDiffReportFilter;
+	isComplated: boolean;
+}
+export class DiffReportCreated
+{
+	public dateTime: dayjs.Dayjs;
+	public filter: IDiffReportFilter;
+	public context: IBusinessCallContext;
+	public static is(data: any) : data is DiffReportCreated
+	{
+		return data instanceof DiffReportCreated;
+	}
+	constructor (context: IBusinessCallContext, dateTime: dayjs.Dayjs, filter: IDiffReportFilter)
+	{
+		this.context = context;
+		this.dateTime = dateTime;
+		this.filter = filter;
+	}
+	public static create(data: any) 
+	{
+		return new DiffReportCreated(
+			fromServer(data['context']) as IBusinessCallContext,
+			fromServer(data['dateTime']) as dayjs.Dayjs,
+			fromServer(data['filter']) as IDiffReportFilter);
+	}
+}
+export class DiffReportComplated
+{
+	public dateTime: dayjs.Dayjs;
+	public diffs: IDiffReportApplication[];
+	public context: IBusinessCallContext;
+	public static is(data: any) : data is DiffReportComplated
+	{
+		return data instanceof DiffReportComplated;
+	}
+	constructor (context: IBusinessCallContext, dateTime: dayjs.Dayjs, diffs: IDiffReportApplication[])
+	{
+		this.context = context;
+		this.dateTime = dateTime;
+		this.diffs = diffs;
+	}
+	public static create(data: any) 
+	{
+		return new DiffReportComplated(
+			fromServer(data['context']) as IBusinessCallContext,
+			fromServer(data['dateTime']) as dayjs.Dayjs,
+			fromServer(data['diffs']) as IDiffReportApplication[]);
+	}
+}
 export interface IIntegrationStage extends IValueObject
 {
 	id: string;
@@ -1227,6 +1351,7 @@ export interface IApplicationView extends IMongoDbReadModel
 	apartmentNumber: (string | null);
 	sourceId: (string | null);
 	fullAddress: (string | null);
+	answer: (string | null);
 	phoneNumber: (string | null);
 }
 export interface IPhoneBindApplicationsCounter
@@ -1269,14 +1394,16 @@ export class ApplicationCreated
 	public apartmentNumber: (string | null);
 	public sourceId: (string | null);
 	public phoneNumber: (string | null);
+	public answer: (string | null);
 	public context: IBusinessCallContext;
 	public static is(data: any) : data is ApplicationCreated
 	{
 		return data instanceof ApplicationCreated;
 	}
-	constructor (address: (string | null), apartmentNumber: (string | null), appealDateTime: dayjs.Dayjs, category: (string | null), cause: (string | null), context: IBusinessCallContext, correctionDate: (dayjs.Dayjs | null), datePlan: (dayjs.Dayjs | null), externalId: number, frame: (string | null), front: (number | null), house: (string | null), message: (string | null), number: string, organizationName: (string | null), phoneNumber: (string | null), sourceId: (string | null), vNum: string)
+	constructor (address: (string | null), answer: (string | null), apartmentNumber: (string | null), appealDateTime: dayjs.Dayjs, category: (string | null), cause: (string | null), context: IBusinessCallContext, correctionDate: (dayjs.Dayjs | null), datePlan: (dayjs.Dayjs | null), externalId: number, frame: (string | null), front: (number | null), house: (string | null), message: (string | null), number: string, organizationName: (string | null), phoneNumber: (string | null), sourceId: (string | null), vNum: string)
 	{
 		this.address = address;
+		this.answer = answer;
 		this.apartmentNumber = apartmentNumber;
 		this.appealDateTime = appealDateTime;
 		this.category = category;
@@ -1299,6 +1426,7 @@ export class ApplicationCreated
 	{
 		return new ApplicationCreated(
 			fromServer(data['address']) as (string | null),
+			fromServer(data['answer']) as (string | null),
 			fromServer(data['apartmentNumber']) as (string | null),
 			fromServer(data['appealDateTime']) as dayjs.Dayjs,
 			fromServer(data['category']) as (string | null),
@@ -1580,20 +1708,78 @@ export class OrganizationUpdated
 			fromServer(data['shortName']) as (string | null));
 	}
 }
+export interface IApplicationStateView extends IMongoDbReadModel
+{
+	name: string;
+	externalId: number;
+	externalGroupId: number;
+}
+export class ApplicationStateUpdated
+{
+	public name: string;
+	public externalId: number;
+	public externalGroupId: number;
+	public context: IBusinessCallContext;
+	public static is(data: any) : data is ApplicationStateUpdated
+	{
+		return data instanceof ApplicationStateUpdated;
+	}
+	constructor (context: IBusinessCallContext, externalGroupId: number, externalId: number, name: string)
+	{
+		this.context = context;
+		this.externalGroupId = externalGroupId;
+		this.externalId = externalId;
+		this.name = name;
+	}
+	public static create(data: any) 
+	{
+		return new ApplicationStateUpdated(
+			fromServer(data['context']) as IBusinessCallContext,
+			fromServer(data['externalGroupId']) as number,
+			fromServer(data['externalId']) as number,
+			fromServer(data['name']) as string);
+	}
+}
+export interface IApplicationTypeView extends IMongoDbReadModel
+{
+	name: string;
+	externalId: number;
+}
+export class ApplicationTypeUpdated
+{
+	public name: string;
+	public externalId: number;
+	public context: IBusinessCallContext;
+	public static is(data: any) : data is ApplicationTypeUpdated
+	{
+		return data instanceof ApplicationTypeUpdated;
+	}
+	constructor (context: IBusinessCallContext, externalId: number, name: string)
+	{
+		this.context = context;
+		this.externalId = externalId;
+		this.name = name;
+	}
+	public static create(data: any) 
+	{
+		return new ApplicationTypeUpdated(
+			fromServer(data['context']) as IBusinessCallContext,
+			fromServer(data['externalId']) as number,
+			fromServer(data['name']) as string);
+	}
+}
 export class FileUpdated
 {
 	public name: string;
 	public extension: string;
-	public creatorId: (string | null);
 	public context: IBusinessCallContext;
 	public static is(data: any) : data is FileUpdated
 	{
 		return data instanceof FileUpdated;
 	}
-	constructor (context: IBusinessCallContext, creatorId: (string | null), extension: string, name: string)
+	constructor (context: IBusinessCallContext, extension: string, name: string)
 	{
 		this.context = context;
-		this.creatorId = creatorId;
 		this.extension = extension;
 		this.name = name;
 	}
@@ -1601,7 +1787,6 @@ export class FileUpdated
 	{
 		return new FileUpdated(
 			fromServer(data['context']) as IBusinessCallContext,
-			fromServer(data['creatorId']) as (string | null),
 			fromServer(data['extension']) as string,
 			fromServer(data['name']) as string);
 	}
@@ -1646,60 +1831,13 @@ export class DepartmentPositionUpdated
 			fromServer(data['name']) as string);
 	}
 }
-export class ApplicationTypeUpdated
-{
-	public name: string;
-	public externalId: number;
-	public context: IBusinessCallContext;
-	public static is(data: any) : data is ApplicationTypeUpdated
-	{
-		return data instanceof ApplicationTypeUpdated;
-	}
-	constructor (context: IBusinessCallContext, externalId: number, name: string)
-	{
-		this.context = context;
-		this.externalId = externalId;
-		this.name = name;
-	}
-	public static create(data: any) 
-	{
-		return new ApplicationTypeUpdated(
-			fromServer(data['context']) as IBusinessCallContext,
-			fromServer(data['externalId']) as number,
-			fromServer(data['name']) as string);
-	}
-}
-export class ApplicationStateUpdated
-{
-	public name: string;
-	public externalId: number;
-	public externalGroupId: number;
-	public context: IBusinessCallContext;
-	public static is(data: any) : data is ApplicationStateUpdated
-	{
-		return data instanceof ApplicationStateUpdated;
-	}
-	constructor (context: IBusinessCallContext, externalGroupId: number, externalId: number, name: string)
-	{
-		this.context = context;
-		this.externalGroupId = externalGroupId;
-		this.externalId = externalId;
-		this.name = name;
-	}
-	public static create(data: any) 
-	{
-		return new ApplicationStateUpdated(
-			fromServer(data['context']) as IBusinessCallContext,
-			fromServer(data['externalGroupId']) as number,
-			fromServer(data['externalId']) as number,
-			fromServer(data['name']) as string);
-	}
-}
 export class DomainEventMap
 {
 	public static create() 
 	{
 		const map = new Map<string, any>();
+		map.set('DiffReportCreated', DiffReportCreated);
+		map.set('DiffReportComplated', DiffReportComplated);
 		map.set('IntegrationStarted', IntegrationStarted);
 		map.set('IntegrationStageStarted', IntegrationStageStarted);
 		map.set('IntegrationStageFinished', IntegrationStageFinished);

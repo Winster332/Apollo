@@ -16,6 +16,7 @@ namespace Apollo.Domain.Integrations.MsSql
 		public string EntityName { get; private set; }
 		public Guid Uid { get; private set; }
 		public int OrderNumber { get; private set; }
+		public bool IsEnabled { get; private set; }
 
 		public SyncImporter(int orderNumber, string stage, string entityName)
 		{
@@ -23,6 +24,13 @@ namespace Apollo.Domain.Integrations.MsSql
 			EntityName = entityName;
 			Uid = Guid.NewGuid();
 			OrderNumber = orderNumber;
+			IsEnabled = false;
+		}
+
+		public SyncImporter SetEnable(bool value)
+		{
+			IsEnabled = value;
+			return this;
 		}
 
 		public SyncReport BeginReport()

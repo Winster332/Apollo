@@ -5,6 +5,7 @@ using Apollo.Web.Infrastructure.React;
 using Apollo.Domain.Accounts.User;
 using Apollo.Domain.Configuration;
 using Apollo.Domain.Integrations.MsSql;
+using Apollo.Domain.Reports;
 using Apollo.Domain.SharedKernel;
 using Apollo.Web.Infrastructure.Configuration;
 using EventFlow.MongoDB.EventStore;
@@ -66,10 +67,12 @@ namespace Apollo.Web.Infrastructure
 
 			services.AddSingleton<SuperuserEnsuringService>();
 			services.AddSingleton<MsSqlSynchronizerService>();
+			services.AddSingleton<ReportGenerator>();
 			// services.AddSingleton<SkuEnsuringService>();
 			// services.AddSingleton<PriceTypeMSEnsuringService>();
 			services.AddSingleton(_superuserConfiguration);
 			services.AddSingleton(_msSqlServerConfiguration);
+			services.AddSingleton(_fileStorageConfiguration);
 			// services.AddTransient<MoySkladService>();
 			// services.AddTransient<MSInitTask>();
 			// services.AddTransient<StoresSynchronizer>();

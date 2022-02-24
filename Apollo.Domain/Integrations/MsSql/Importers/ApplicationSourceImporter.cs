@@ -53,7 +53,7 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 			foreach (var extState in externalStates)
 			{
 				var externalId = extState.Id;
-				var externalGroupId = extState.Id;
+				var externalGroupId = extState.Group;
 				var internalView = GetFromCache(cache, externalGroupId, externalId);
 				var cmd = new EnsuringApplicationSourceCommand(
 					internalView.Select(v => ApplicationSourceId.With(v.Id)),
@@ -92,7 +92,11 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 
 				if (!isUpdated)
 				{
-					cache.Add(externalGroupId, new Dictionary<int, ApplicationSourceView>());
+					if (!cache.ContainsKey(externalGroupId))
+					{
+						cache.Add(externalGroupId, new Dictionary<int, ApplicationSourceView>());
+					}
+					
 					cache[externalGroupId].Add(externalId, internalView);
 					report.AddUpdated(internalView.Id);
 				}

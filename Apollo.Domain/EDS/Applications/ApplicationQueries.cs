@@ -11,10 +11,12 @@ using JetBrains.Annotations;
 using MongoDB.Driver;
 using System.Linq;
 using System.Linq.Expressions;
+using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.Employees;
 using Apollo.Domain.SharedKernel;
 using MongoDB.Bson;
 using Apollo.Domain.Extensions;
+using EventFlow.Core;
 
 namespace Apollo.Domain.EDS.Applications
 {
@@ -107,6 +109,52 @@ namespace Apollo.Domain.EDS.Applications
 				.Select(c => new PhoneBindApplicationsCounter(c.Key, c.Count()))
 				.ToReadOnly()
 				.AsTaskResult();
+		}
+	}
+	
+	public class ListApplicationsForDiffReportQuery: ReadModelQuery<IReadOnlyCollection<ApplicationView>, ApplicationView>
+	{
+		public DateTime AppealDateTimeFrom { get; }
+		public DateTime AppealDateTimeTo { get; }
+		public IReadOnlyCollection<ApplicationSourceId> SourceIds { get; }
+		
+		public ListApplicationsForDiffReportQuery(
+			DateTime appealDateTimeFrom, DateTime appealDateTimeTo, IReadOnlyCollection<ApplicationSourceId> sourceIds)
+		{
+			AppealDateTimeFrom = appealDateTimeFrom;
+			AppealDateTimeTo = appealDateTimeTo;
+			SourceIds = sourceIds;
+		}
+
+		public override Task<IReadOnlyCollection<ApplicationView>> Run(
+			IMongoDbReadModelStore<ApplicationView> viewStore,
+			CancellationToken ct)
+		{
+			var query = viewStore.AsQueryable();
+
+			return query.ToReadOnly().AsTaskResult();
+		}
+	}
+	
+	public class ListApplicationsByIdsQuery: ReadModelQuery<IReadOnlyCollection<ApplicationView>, ApplicationView>
+	{
+		public IReadOnlyCollection<ApplicationId> ApplicationIds { get; }
+		public ListApplicationsByIdsQuery(IReadOnlyCollection<ApplicationId> applicationIds)
+		{
+			ApplicationIds = applicationIds;
+		}
+
+		public override Task<IReadOnlyCollection<ApplicationView>> Run(
+			IMongoDbReadModelStore<ApplicationView> viewStore,
+			CancellationToken ct)
+		{
+			var query = viewStore.AsQueryable();
+			var appIds = ApplicationIds.Select(x => x.Value).ToArray();
+			
+			query = query.Where(a => appIds.Contains(a.Id));
+			query = query.OrderByDescending(c => c.AppealDateTime);
+
+			return query.ToReadOnly().AsTaskResult();
 		}
 	}
 	
@@ -229,14 +277,16 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<DateTime> AppealDateTimeTo { get; }
 		public int Page { get; }
 		public int PageSize { get; }
+		public Maybe<IReadOnlyCollection<ApplicationSourceId>> SourceIds { get; }
 		public ListApplicationsPagedQuery(
-			int pageIndex, int pageSize, Maybe<string> searchText, Maybe<DateTime> appealDateTimeFrom, Maybe<DateTime> appealDateTimeTo): base(pageSize, pageIndex)
+			int pageIndex, int pageSize, Maybe<string> searchText, Maybe<DateTime> appealDateTimeFrom, Maybe<DateTime> appealDateTimeTo, Maybe<IReadOnlyCollection<ApplicationSourceId>> sourceIds): base(pageSize, pageIndex)
 		{
 			SearchText = searchText;
 			AppealDateTimeFrom = appealDateTimeFrom;
 			AppealDateTimeTo = appealDateTimeTo;
 			Page = pageIndex;
 			PageSize = pageSize;
+			SourceIds = sourceIds;
 		}
 
 		public override Task<SearchResult<ApplicationView>> Run(
@@ -266,6 +316,8 @@ namespace Apollo.Domain.EDS.Applications
 	[UsedImplicitly]
 	public class ApplicationQueryHandler:
 		IQueryHandler<ListApplicationsQuery, IReadOnlyCollection<ApplicationView>>,
+		IQueryHandler<ListApplicationsByIdsQuery, IReadOnlyCollection<ApplicationView>>,
+		IQueryHandler<ListApplicationsForDiffReportQuery, IReadOnlyCollection<ApplicationView>>,
 		IQueryHandler<DiagramApplicationQuery, IReadOnlyCollection<LineDiagramDate<DateTime>>>,
 		IQueryHandler<ListApplicationsByPhoneQuery, IReadOnlyCollection<ApplicationView>>,
 		IQueryHandler<ListCountApplicationsByPhoneQuery, IReadOnlyCollection<PhoneBindApplicationsCounter>>,
@@ -302,6 +354,14 @@ namespace Apollo.Domain.EDS.Applications
 			
 			query.AppealDateTimeFrom.Do(dt => expressions.Add(Builders<ApplicationView>.Filter.Gte(c => c.AppealDateTime, dt)));
 			query.AppealDateTimeTo.Do(dt => expressions.Add(Builders<ApplicationView>.Filter.Lte(c => c.AppealDateTime, dt)));
+
+			query.SourceIds.Do(sourceIds =>
+			{
+				expressions.Add(Builders<ApplicationView>.Filter.Or(sourceIds
+					.Select(x => x.ToMaybe())
+					.Select(id => Builders<ApplicationView>.Filter.Eq(c => c.SourceId, id))
+					.ToArray()));
+			});
 
 			query.SearchText.Do(s =>
 			{
@@ -356,6 +416,35 @@ namespace Apollo.Domain.EDS.Applications
 			query.Run(_viewStore, ct);
 
 		public Task<IReadOnlyCollection<LineDiagramDate<DateTime>>> ExecuteQueryAsync(DiagramApplicationQuery query, CancellationToken ct) =>
+			query.Run(_viewStore, ct);
+
+		public async Task<IReadOnlyCollection<ApplicationView>> ExecuteQueryAsync(ListApplicationsForDiffReportQuery query, CancellationToken ct)
+		{
+			var collection = _mongoDatabase.GetCollection<ApplicationView>(_readModelDescriptionProvider.GetReadModelDescription<ApplicationView>().RootCollectionName.Value);
+			var expressions = new List<FilterDefinition<ApplicationView>>
+			{
+				Builders<ApplicationView>.Filter.Gte(c => c.AppealDateTime, query.AppealDateTimeFrom),
+				Builders<ApplicationView>.Filter.Lte(c => c.AppealDateTime, query.AppealDateTimeTo),
+				Builders<ApplicationView>.Filter.Or(query.SourceIds
+					.Select(x => x.ToMaybe())
+					.Select(id => Builders<ApplicationView>.Filter.Eq(c => c.SourceId, id))
+					.ToArray())
+			};
+
+			var pipeline = collection
+				.Aggregate()
+				.Sort(Builders<ApplicationView>.Sort.Descending(c => c.AppealDateTime));
+
+			if (expressions.Count != 0)
+			{
+				pipeline = pipeline
+					.Match(Builders<ApplicationView>.Filter.And(expressions));
+			}
+
+			return await pipeline.ToListAsync(ct);
+		}
+
+		public Task<IReadOnlyCollection<ApplicationView>> ExecuteQueryAsync(ListApplicationsByIdsQuery query, CancellationToken ct) =>
 			query.Run(_viewStore, ct);
 	}
 	

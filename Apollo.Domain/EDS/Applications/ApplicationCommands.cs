@@ -33,6 +33,7 @@ namespace Apollo.Domain.EDS.Applications
 			Maybe<string> apartmentNumber,
 			Maybe<ApplicationSourceId> sourceId,
 			Maybe<string> phoneNumber,
+			Maybe<string> answer,
 			ApplicationStateId stateId)
 			: base(id.OrElse(ApplicationId.New))
 		{
@@ -54,6 +55,7 @@ namespace Apollo.Domain.EDS.Applications
 			SourceId = sourceId;
 			PhoneNumber = phoneNumber;
 			StateId = stateId;
+			Answer = answer;
 		}
 
 		public int ExternalId { get; }
@@ -74,6 +76,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<ApplicationSourceId> SourceId { get; }
 		public Maybe<string> PhoneNumber { get; }
 		public ApplicationStateId StateId { get; }
+		public Maybe<string> Answer { get; }
 	}
 	
 	public class CreateApplicationCommand: Command<Application, ApplicationId, ExecutionResult<ApplicationId>>

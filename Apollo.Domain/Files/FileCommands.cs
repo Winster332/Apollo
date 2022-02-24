@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Apollo.Domain.Accounts.User;
 using Apollo.Domain.SharedKernel;
 using EventFlow.Commands;
 using Functional.Maybe;
@@ -15,22 +14,19 @@ namespace Apollo.Domain.Files
 			Maybe<FileId> id, 
 			FileName name, 
 			FileExtension extension, 
-			Stream stream,
-			Maybe<UserId> creatorId)
+			byte[] data)
 			: base(id.OrElse(FileId.New))
 		{
 			Id = id;
 			Name = name;
 			Extension = extension;
-			Stream = stream;
-			CreatorId = creatorId;
+			Data = data;
 		}
 	
 		public Maybe<FileId> Id { get; }
 		public FileName Name { get; }
 		public FileExtension Extension { get; }
-		public Stream Stream { get; }
-		public Maybe<UserId> CreatorId { get; }
+		public byte[] Data { get; }
 	}
 	
 	[UsedImplicitly]

@@ -45,7 +45,7 @@ namespace Apollo.Domain.Accounts.Role
 						RoleAccessId.UserList,
 						RoleAccessId.ReportFromSite,
 						RoleAccessId.ReportFromVk,
-						RoleAccessId.ReportFromG,
+						RoleAccessId.ReportDifference,
 						RoleAccessId.ReportFromAds,
 						
 						RoleAccessId.IntegrationList,

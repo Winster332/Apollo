@@ -9,8 +9,9 @@ import { App as OrganizationsListApp } from './Apps/Organizations/List/App';
 import { App as PeoplesListApp } from './Apps/Peoples/List/App';
 import { App as PeoplesPeopleApp } from './Apps/Peoples/People/App';
 import { App as ReportsApplicationsByOrganizationsApp } from './Apps/Reports/ApplicationsByOrganizations/App';
+import { App as ReportsDifferenceListApp } from './Apps/Reports/Difference/List/App';
+import { App as ReportsDifferenceReportApp } from './Apps/Reports/Difference/Report/App';
 import { App as ReportsFromAdsApp } from './Apps/Reports/FromAds/App';
-import { App as ReportsFromGApp } from './Apps/Reports/FromG/App';
 import { App as ReportsFromSiteApp } from './Apps/Reports/FromSite/App';
 import { App as UsersListApp } from './Apps/Users/List/App';
 import { App as UsersRolesListApp } from './Apps/Users/Roles/List/App';
@@ -28,8 +29,9 @@ export const Apps = {
 	'PeoplesListApp': { app: PeoplesListApp, cssClass: 'PeoplesList' },
 	'PeoplesPeopleApp': { app: PeoplesPeopleApp, cssClass: 'PeoplesPeople' },
 	'ReportsApplicationsByOrganizationsApp': { app: ReportsApplicationsByOrganizationsApp, cssClass: 'ReportslicationsByOrganizationsApp' },
+	'ReportsDifferenceListApp': { app: ReportsDifferenceListApp, cssClass: 'ReportsDifferenceList' },
+	'ReportsDifferenceReportApp': { app: ReportsDifferenceReportApp, cssClass: 'ReportsDifferenceReport' },
 	'ReportsFromAdsApp': { app: ReportsFromAdsApp, cssClass: 'ReportsFromAds' },
-	'ReportsFromGApp': { app: ReportsFromGApp, cssClass: 'ReportsFromG' },
 	'ReportsFromSiteApp': { app: ReportsFromSiteApp, cssClass: 'ReportsFromSite' },
 	'UsersListApp': { app: UsersListApp, cssClass: 'UsersList' },
 	'UsersRolesListApp': { app: UsersRolesListApp, cssClass: 'UsersRolesList' },

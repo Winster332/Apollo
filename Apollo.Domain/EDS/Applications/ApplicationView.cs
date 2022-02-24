@@ -38,6 +38,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<string> ApartmentNumber { get; private set; }
 		public Maybe<ApplicationSourceId> SourceId { get; private set; }
 		public Maybe<string> FullAddress => GetFullAddress();
+		public Maybe<string> Answer { get; private set; }
 		public Maybe<string> PhoneNumber { get; private set; }
 
 		private Maybe<string> GetFullAddress()
@@ -78,6 +79,7 @@ namespace Apollo.Domain.EDS.Applications
 			ApartmentNumber = e.ApartmentNumber;
 			SourceId = e.SourceId;
 			PhoneNumber = e.PhoneNumber;
+			Answer = e.Answer;
 		}
 
 		public void Apply(IReadModelContext context, IDomainEvent<Application, ApplicationId, ApplicationDescribed> domainEvent)

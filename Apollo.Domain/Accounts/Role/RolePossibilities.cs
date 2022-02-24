@@ -42,7 +42,7 @@ namespace Apollo.Domain.Accounts.Role
 		/// </summary>
 		public static readonly RoleAccessId ReportFromSite = With(RoleAccess.ReportFromSite);
 		public static readonly RoleAccessId ReportFromVk = With(RoleAccess.ReportFromVk);
-		public static readonly RoleAccessId ReportFromG = With(RoleAccess.ReportFromG);
+		public static readonly RoleAccessId ReportDifference = With(RoleAccess.ReportDifference);
 		public static readonly RoleAccessId ReportFromAds = With(RoleAccess.ReportFromAds);
 		
 		public static readonly RoleAccessId IntegrationList = With(RoleAccess.IntegrationList);
@@ -62,7 +62,7 @@ namespace Apollo.Domain.Accounts.Role
 		
 		public const string ReportFromSite = "roleaccess-00000000-0000-0000-0000-000000000008";
 		public const string ReportFromVk = "roleaccess-00000000-0000-0000-0000-000000000009";
-		public const string ReportFromG = "roleaccess-00000000-0000-0000-0000-000000000010";
+		public const string ReportDifference = "roleaccess-00000000-0000-0000-0000-000000000010";
 		public const string ReportFromAds = "roleaccess-00000000-0000-0000-0000-000000000011";
 		
 		public const string IntegrationList = "roleaccess-00000000-0000-0000-0000-000000000012";

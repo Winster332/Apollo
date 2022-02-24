@@ -9,8 +9,9 @@ export type AppNames =
 	'PeoplesListApp' |
 	'PeoplesPeopleApp' |
 	'ReportsApplicationsByOrganizationsApp' |
+	'ReportsDifferenceListApp' |
+	'ReportsDifferenceReportApp' |
 	'ReportsFromAdsApp' |
-	'ReportsFromGApp' |
 	'ReportsFromSiteApp' |
 	'UsersListApp' |
 	'UsersRolesListApp' |

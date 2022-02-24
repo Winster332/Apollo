@@ -112,6 +112,7 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 					extApp.Flat.ToMaybe().Where(x => x.NotEmpty()).Select(s => s.Trim()),
 					GetSourceId(sourceCache, extApp),
 					extApp.PhoneNumber.ToMaybe().Where(x => x.NotEmpty()).Select(x => x.Trim()),
+					extApp.Made.ToMaybe().Where(x => x.NotEmpty()).Select(x => x.Trim()),
 					GetStateId(stateCache, extApp).OrElse(ApplicationStateId.EmptyId)
 				);
 				

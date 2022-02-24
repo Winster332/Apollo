@@ -29,10 +29,10 @@ namespace Apollo.Domain.Files
 			
 			using (var fileStream = System.IO.File.Create(path))
 			{
-				cmd.Stream.CopyTo(fileStream);
+				fileStream.Write(cmd.Data);
 			}
 			
-			Emit(new FileUpdated(cmd.Name, cmd.Extension, cmd.CreatorId, ctx));
+			Emit(new FileUpdated(cmd.Name, cmd.Extension, ctx));
 			
 			return ExecutionResult<FileId>.Success(Id);
 		}

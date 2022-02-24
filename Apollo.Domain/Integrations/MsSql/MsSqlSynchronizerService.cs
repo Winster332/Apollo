@@ -37,12 +37,12 @@ namespace Apollo.Domain.Integrations.MsSql
 
 		private IReadOnlyCollection<SyncImporter> RegistryImporters() => new SyncImporter[]
 		{
-			new ApplicationSourceImporter(1, "Источники заявок", nameof(ApplicationSourceView)),
-			new ApplicationTypeImporter(2, "Типы заявок", nameof(ApplicationTypeView)),
-			new ApplicationStateImporter(3, "Состояния заявок", nameof(ApplicationStateView)),
-			new OrganizationImporter(4, "Организации", nameof(OrganizationView)),
-			new PeoplesImporter(5, "Люди", nameof(PeopleView)),
-			new ApplicationImporter(6, "Заявки", nameof(ApplicationView))
+			new ApplicationSourceImporter(1, "Источники заявок", nameof(ApplicationSourceView)).SetEnable(true),
+			new ApplicationTypeImporter(2, "Типы заявок", nameof(ApplicationTypeView)).SetEnable(true),
+			new ApplicationStateImporter(3, "Состояния заявок", nameof(ApplicationStateView)).SetEnable(true),
+			new OrganizationImporter(4, "Организации", nameof(OrganizationView)).SetEnable(true),
+			// new PeoplesImporter(5, "Люди", nameof(PeopleView)).SetEnable(false),
+			new ApplicationImporter(6, "Заявки", nameof(ApplicationView)).SetEnable(true)
 		};
 
 		public async Task<ExecutionResult<IntegrationView>> Start(CancellationToken ct)
@@ -70,6 +70,11 @@ namespace Apollo.Domain.Integrations.MsSql
 				{
 					try
 					{
+						if (!syncImporter.IsEnabled)
+						{
+							continue;
+						}
+						
 						syncImporter.Initialize(context, _queryProcessor, _commandBus);
 						
 						await _commandBus.PublishAsync(new BeginStageIntegrationCommand(integrationId, syncImporter.Uid));
