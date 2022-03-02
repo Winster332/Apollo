@@ -35,6 +35,10 @@ export class Store {
 	@observable
 	public applicationViews: IApplicationView[];
 	
+	public print = () => {
+		window.print();
+	};
+	
 	public viewFiles = (item: IDiffReportApplication, idx: number) => {
 		this.imageViewerDialogStore.open(item.before.photoIds, item.after.photoIds, idx)
 	};

@@ -1,5 +1,5 @@
 import {
-	Box, Breadcrumbs, Card, CardContent, Chip, Grid,
+	Box, Breadcrumbs, Button, Card, CardContent, Chip, Grid,
 	Link, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Tooltip,
 	Typography
 } from '@material-ui/core';
@@ -15,6 +15,8 @@ import {
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import styled from "styled-components";
 import {ImageViewerDialog} from "./ImageViewer";
+import PrintIcon from "@material-ui/icons/Print";
+import {DoNotPrint} from "@Shared/DoNotPrint";
 
 const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings) => {
 	const store = React.useState(() => new Store(props))[0];
@@ -28,23 +30,34 @@ const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings
 					<TableRow>
 						<TableCell colSpan={1}>
 							<Grid container xs={12}>
-								<Grid item xs={6} style={{paddingTop: '16px'}}>
-									Отчет по заявкам с <span style={{color: '#f58787'}}>{store.reportView.filter.from.format('DD.MM.YYYY hh:mm')}</span> по <span style={{color: '#f58787'}}>{store.reportView.filter.to.format('DD.MM.YYYY hh:mm')}</span>
+								<Grid item xs={7} style={{paddingTop: '7px'}}>
+									<Box style={{display: 'flex'}}>
+										<DoNotPrint>
+											<Button variant='outlined' style={{marginRight: '10px'}} onClick={() => store.print()} startIcon={<PrintIcon/>}>
+												Печать
+											</Button>
+										</DoNotPrint>
+										<Box style={{marginTop: '5px'}}>
+											Отчет по заявкам с <span style={{color: '#f58787'}}>{store.reportView.filter.from.format('DD.MM.YYYY hh:mm')}</span> по <span style={{color: '#f58787'}}>{store.reportView.filter.to.format('DD.MM.YYYY hh:mm')}</span>
+										</Box>
+									</Box>
 								</Grid>
-								<Grid item xs={6}>
-									<TablePagination
-										rowsPerPageOptions={pagination.rowsPerPageOptions}
-										component="div"
-										count={pagination.totalRows}
-										rowsPerPage={pagination.currentRowsPerPage}
-										page={pagination.currentPage}
-										onPageChange={(e, newPage) => {
-											if (e) {
-												pagination.changedPage(newPage);
-											}
-										}}
-										onRowsPerPageChange={(e) => pagination.changedRowsPerPage(parseInt(e.target.value, 10))}
-									/>
+								<Grid item xs={5}>
+									<DoNotPrint>
+										<TablePagination
+											rowsPerPageOptions={pagination.rowsPerPageOptions}
+											component="div"
+											count={pagination.totalRows}
+											rowsPerPage={pagination.currentRowsPerPage}
+											page={pagination.currentPage}
+											onPageChange={(e, newPage) => {
+												if (e) {
+													pagination.changedPage(newPage);
+												}
+											}}
+											onRowsPerPageChange={(e) => pagination.changedRowsPerPage(parseInt(e.target.value, 10))}
+										/>
+									</DoNotPrint>
 								</Grid>
 							</Grid>
 						</TableCell>
