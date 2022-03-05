@@ -13,6 +13,7 @@ import { App as ReportsDifferenceListApp } from './Apps/Reports/Difference/List/
 import { App as ReportsDifferenceReportApp } from './Apps/Reports/Difference/Report/App';
 import { App as ReportsFromAdsApp } from './Apps/Reports/FromAds/App';
 import { App as ReportsFromSiteApp } from './Apps/Reports/FromSite/App';
+import { App as ReportsPlanApp } from './Apps/Reports/Plan/App';
 import { App as UsersListApp } from './Apps/Users/List/App';
 import { App as UsersRolesListApp } from './Apps/Users/Roles/List/App';
 import { App as UsersRolesRoleApp } from './Apps/Users/Roles/Role/App';
@@ -33,6 +34,7 @@ export const Apps = {
 	'ReportsDifferenceReportApp': { app: ReportsDifferenceReportApp, cssClass: 'ReportsDifferenceReport' },
 	'ReportsFromAdsApp': { app: ReportsFromAdsApp, cssClass: 'ReportsFromAds' },
 	'ReportsFromSiteApp': { app: ReportsFromSiteApp, cssClass: 'ReportsFromSite' },
+	'ReportsPlanApp': { app: ReportsPlanApp, cssClass: 'ReportsPlan' },
 	'UsersListApp': { app: UsersListApp, cssClass: 'UsersList' },
 	'UsersRolesListApp': { app: UsersRolesListApp, cssClass: 'UsersRolesList' },
 	'UsersRolesRoleApp': { app: UsersRolesRoleApp, cssClass: 'UsersRolesRole' },

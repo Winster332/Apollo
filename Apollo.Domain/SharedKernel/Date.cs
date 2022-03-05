@@ -96,6 +96,7 @@ namespace Apollo.Domain.SharedKernel
 	public static class DateDsl
 	{
 		public static Date AsDate(this DateTime dt) => new(dt.Date);
+		public static DateTime AsDateTime(this Date dt) => dt.Start;
 
 		public static Maybe<Date> AsDate([CanBeNull] this string s) =>
 			s.ToMaybe()

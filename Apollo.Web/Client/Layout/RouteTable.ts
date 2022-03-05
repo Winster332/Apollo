@@ -103,6 +103,8 @@ export class RouteTable {
 					.route('По организациям', true),
 				ReportController.fromSite()
 					.route('Сайт', false),
+				ReportController.plan()
+					.route('План', true),
 				ReportController.differenceList()
 					.route('Разница', true),
 				ReportController.differenceReport('')

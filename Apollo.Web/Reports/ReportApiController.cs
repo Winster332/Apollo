@@ -71,6 +71,19 @@ namespace Apollo.Web.Reports
 			return await _reportGenerator.GenerateDifferenceReport(query.From, query.To);
 		}
 		
+		public async Task<ActionResult<ExecutionResult<IReadOnlyCollection<ApplicationsPlanReportBySource>>>> PlanList(PlanListUiQuery query)
+		{
+			var from = query.From;
+			var to = query.To;
+			var applicationSourceViews = await QueryProcessor.ProcessAsync(new ListApplicationSourceQuery());
+			var applicationSourceFilter = applicationSourceViews
+				.Select(source => ApplicationSourceId.With(source.Id))
+				.ToArray();
+			var report = await QueryProcessor.ProcessAsync(new PlanApplicationsReportByOrganizationsQuery(from, to, applicationSourceFilter, true));
+			
+			return report.AsSuccess();
+		}
+		
 		public async Task<ActionResult<PrintReportResult>> ByOrganizationsPrintReport(PrintApplicationOrganizationsReportCommandUI q)
 		{
 			var fileContent = await ApplicationReportGenerator.ApplicationsByOrganizationsQueryAsync(
@@ -91,6 +104,22 @@ namespace Apollo.Web.Reports
 				QueryProcessor,
 				q.From,
 				q.To
+			);
+			var blob = new FileContentResult(
+				fileContent,
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+			);
+			
+			return new PrintReportResult(blob);
+		}
+		
+		public async Task<ActionResult<PrintReportResult>> PlanPrintReport(PrintApplicationAdsReportCommandUI q)
+		{
+			var fileContent = await ApplicationReportGenerator.PlanQueryAsync(
+				QueryProcessor,
+				q.From.Value.AsDate(),
+				q.To.Value.AsDate(),
+				HttpContext.RequestAborted
 			);
 			var blob = new FileContentResult(
 				fileContent,

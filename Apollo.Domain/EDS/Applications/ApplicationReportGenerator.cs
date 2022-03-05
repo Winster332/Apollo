@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.Organizations;
+using Apollo.Domain.Extensions;
 using Apollo.Domain.SharedKernel;
 using Apollo.Domain.Spreadsheets;
 using EventFlow.Queries;
@@ -23,6 +24,121 @@ namespace Apollo.Domain.EDS.Applications
 				.AsEnumerable();
 
 			return applicationViews.ToArray();
+		}
+		
+		private static async Task<IReadOnlyCollection<ApplicationsPlanReportBySource>> LoadApplicationsReports(IQueryProcessor queryProcessor, Date from, Date to, IReadOnlyCollection<ApplicationSourceView> sourceViews, CancellationToken ct)
+		{
+			var applicationSourceFilter = sourceViews
+				.Select(source => ApplicationSourceId.With(source.Id))
+				.ToArray();
+			
+			return await queryProcessor.ProcessAsync(new PlanApplicationsReportByOrganizationsQuery(from, to, applicationSourceFilter, true), ct);
+		}
+		
+		public static async Task<byte[]> PlanQueryAsync(IQueryProcessor queryProcessor, Date from, Date to, CancellationToken ct)
+		{
+			var sourceViews = await queryProcessor.ProcessAsync(new ListApplicationSourceQuery(), ct);
+			var bySources = await LoadApplicationsReports(queryProcessor, from, to, sourceViews, ct);
+			
+			var package = new ExcelPackage();
+
+			bySources
+				.ForEach(s =>
+				{
+					var sourceName = sourceViews
+						.FirstMaybe(x => ApplicationSourceId.With(x.Id).ToMaybe() == s.SourceId)
+						.Select(x => x.Name)
+						.OrElse("Без источника");
+					var worksheet = package.Workbook.Worksheets.Add($"Отчет \"{sourceName}\"");
+					BuildReport(worksheet, s.Reports);
+				});
+			
+			BuildReport(package.Workbook.Worksheets.Add("Все"), bySources.SelectMany(x => x.Reports).ToArray());
+			
+			return package.ToBytes();
+
+			IReadOnlyCollection<Date> GetDays()
+			{
+				var days = new List<Date>();
+				for (var d = from; d < to; d = d.AddDays(1))
+				{
+					days.Add(d);
+				}
+
+				return days.OrderBy(x => x).ToReadOnly();
+			}
+			
+			IReadOnlyCollection<string> BuildCaption(IReadOnlyCollection<OrganizationWithApplicationsPlanReport> reports)
+			{
+				var caption = new List<string>();
+				caption.Add(reports.Select(x => x.ApplicationsCount).Sum().ToString());
+				var days = GetDays();
+				
+				foreach (var date in days)
+				{
+					var d = date.AsDateTime();
+					caption.Add($"{@d:dd.MM.yyyy}");
+				}
+
+				return caption;
+			}
+
+			void BuildReport(ExcelWorksheet worksheet, IReadOnlyCollection<OrganizationWithApplicationsPlanReport> reports)
+			{
+				var table = new ExcelTable(worksheet, 1);
+				table.AddRow(false, false, true, $"Сводка заявок по дате обращения c {@from.AsDateTime():dd.MM.yyyy} по {@to.AsDateTime():dd.MM.yyyy}");
+				table.AddEmptyRow();
+
+				var caption = BuildCaption(reports).ToArray();
+				table.Bold(caption.Select((_, idx) => idx+1).ToArray());
+				table.AddRow(true, true, true, caption);
+
+				var days = GetDays();
+
+				var rows = reports
+					.Select(x =>
+					{
+						var orgName = x.Organization.OrElse("Без организации");
+
+						return new
+						{
+							Org = orgName,
+							Count = x.ApplicationsCount,
+							Day = x.Day
+						};
+					})
+					.OrderBy(x => x.Day)
+					.GroupBy(g => g.Org)
+					.Select(x =>
+					{
+						var items = days.Select(day => new
+						{
+							Day = day,
+							Count = reports
+								.Where(r => r.Day == day && r.Organization.OrElse("Без организации") == x.Key)
+								.Select(r => r.ApplicationsCount)
+								.Sum()
+						});
+						return new
+						{
+							Org = x.Key,
+							Items = items
+						};
+					})
+					.ToArray();
+
+				foreach (var row in rows)
+				{
+					var values = new[] {row.Org}.Concat(row.Items.Select(x => x.Count.ToString())).ToArray();
+					
+					table.AddRow(
+						true,
+						true,
+						false,
+						values
+					);
+				}
+			}
 		}
 		
 		public static async Task<byte[]> AdsQueryAsync(IQueryProcessor queryProcessor, Maybe<DateTime> from, Maybe<DateTime> to)

@@ -36,9 +36,9 @@ export class Store {
 	@observable
 	public addressViews: IAddressView[];
 	@observable
-	public tt: boolean = false;
-	@observable
 	public applicationSourceViews: IApplicationSourceView[];
+	@observable
+	public tt: boolean = false;
 	public initTable = () => {
 		if (!this.tt) {
 			window.addEventListener('mouseup', this.draggableTableStore.windowMouseUp);

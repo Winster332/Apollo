@@ -81,6 +81,25 @@ namespace Apollo.Web.Reports
 			var report = await QueryProcessor.ProcessAsync(new ApplicationsReportByOrganizationsQuery(year));
 			return await React(new ReportsApplicationsByOrganizationsAppSettings(report, year));
 		});
+		
+		[AccessEndpoint(RoleAccess.ReportPlan)]
+		public Task<TypedResult<ReportsPlanAppSettings>> Plan() => Authenticated(async () =>
+		{
+			var from = Date.Now.AddDays(-5);
+			var to = Date.Now.AddDays(25);
+			var applicationSourceViews = await QueryProcessor.ProcessAsync(new ListApplicationSourceQuery());
+			var applicationSourceFilter = applicationSourceViews
+				.Select(source => ApplicationSourceId.With(source.Id))
+				.ToArray();
+			var report = await QueryProcessor.ProcessAsync(new PlanApplicationsReportByOrganizationsQuery(from, to, applicationSourceFilter, true));
+			
+			return await React(new ReportsPlanAppSettings(
+				report,
+				applicationSourceViews,
+				from.AsDateTime(),
+				to.AsDateTime()
+			));
+		});
 	}
 	
 	public record ReportsFromSiteAppSettings();
@@ -89,7 +108,12 @@ namespace Apollo.Web.Reports
 		IReadOnlyCollection<ApplicationSourceView> ApplicationSourceViews,
 		IReadOnlyCollection<AddressView> AddressViews,
 		IReadOnlyCollection<OrganizationView> OrganizationViews);
+	public record ReportsPlanAppSettings(
+		IReadOnlyCollection<ApplicationsPlanReportBySource> Reports,
+		IReadOnlyCollection<ApplicationSourceView> ApplicationSourceViews,
+		DateTime DateFrom,
+		DateTime DateTo);
 	public record ReportsDifferenceListAppSettings(SearchResult<DiffReportView> SearchResultReportViews);
 	public record ReportsDifferenceReportAppSettings(DiffReportView ReportView, IReadOnlyCollection<ApplicationView> ApplicationViews);
-	public record ReportsApplicationsByOrganizationsAppSettings(IReadOnlyCollection<ListReportByOrganizationWithApplications> Report, int currentYear);
+	public record ReportsApplicationsByOrganizationsAppSettings(IReadOnlyCollection<ListReportByOrganizationWithApplications> Report, int CurrentYear);
 }

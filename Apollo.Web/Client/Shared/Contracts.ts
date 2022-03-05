@@ -223,6 +223,12 @@ export class ReportApiControllerProxy
 		return this.http.post('/api/ReportApi/GenerateDiffReport', params)
 			.then((response: { data: any }) => { return fromServer(response.data) as IExecutionResult<IDiffReportView>; });
 	}
+	public planList(query: IPlanListUiQuery) : Promise<IExecutionResult<IApplicationsPlanReportBySource[]>>
+	{
+		const params = { 'query': fromClient(query) };
+		return this.http.post('/api/ReportApi/PlanList', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as IExecutionResult<IApplicationsPlanReportBySource[]>; });
+	}
 	public byOrganizationsPrintReport(q: IPrintApplicationOrganizationsReportCommandUI) : Promise<IPrintReportResult>
 	{
 		const params = { 'q': fromClient(q) };
@@ -233,6 +239,12 @@ export class ReportApiControllerProxy
 	{
 		const params = { 'q': fromClient(q) };
 		return this.http.post('/api/ReportApi/AdsPrintReport', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as IPrintReportResult; });
+	}
+	public planPrintReport(q: IPrintApplicationAdsReportCommandUI) : Promise<IPrintReportResult>
+	{
+		const params = { 'q': fromClient(q) };
+		return this.http.post('/api/ReportApi/PlanPrintReport', params)
 			.then((response: { data: any }) => { return fromServer(response.data) as IPrintReportResult; });
 	}
 	public http: HttpService;
@@ -293,6 +305,15 @@ export class ReportController
 			}
 		);
 	}
+	public static plan() : LocationDescriptor<'ReportsPlanApp'>
+	{
+		return new LocationDescriptor(
+			'ReportsPlanApp',
+			'roleaccess-00000000-0000-0000-0000-000000000016',
+			'/report/plan',
+			{}
+		);
+	}
 }
 export interface IPrintApplicationOrganizationsReportCommandUI
 {
@@ -335,6 +356,14 @@ export interface IReportsApplicationsByOrganizationsAppSettings
 	equalityContract: any;
 	report: IListReportByOrganizationWithApplications[];
 	currentYear: number;
+}
+export interface IReportsPlanAppSettings
+{
+	equalityContract: any;
+	reports: IApplicationsPlanReportBySource[];
+	applicationSourceViews: IApplicationSourceView[];
+	dateFrom: dayjs.Dayjs;
+	dateTo: dayjs.Dayjs;
 }
 /** Result of ApiControllerProxyGenerator activity */
 export class PeopleApiControllerProxy
@@ -594,15 +623,13 @@ export class ApplicationApiControllerProxy
 /** Result of ReactControllerProxyGenerator activity */
 export class ApplicationController
 {
-	public static list(size: number) : LocationDescriptor<'ApplicationsListApp'>
+	public static list() : LocationDescriptor<'ApplicationsListApp'>
 	{
 		return new LocationDescriptor(
 			'ApplicationsListApp',
 			'roleaccess-00000000-0000-0000-0000-000000000004',
 			'/application/list',
-			{
-				size: size
-			}
+			{}
 		);
 	}
 }
@@ -623,6 +650,11 @@ export interface IFilterApplicationPagedUiQuery
 	month: (number | null);
 }
 export interface IGenerateDiffReportUiCommand
+{
+	from: dayjs.Dayjs;
+	to: dayjs.Dayjs;
+}
+export interface IPlanListUiQuery
 {
 	from: dayjs.Dayjs;
 	to: dayjs.Dayjs;
@@ -1353,6 +1385,17 @@ export interface IApplicationView extends IMongoDbReadModel
 	fullAddress: (string | null);
 	answer: (string | null);
 	phoneNumber: (string | null);
+}
+export interface IApplicationsPlanReportBySource
+{
+	sourceId: (string | null);
+	reports: IOrganizationWithApplicationsPlanReport[];
+}
+export interface IOrganizationWithApplicationsPlanReport
+{
+	organization: (string | null);
+	applicationsCount: number;
+	day: dayjs.Dayjs;
 }
 export interface IPhoneBindApplicationsCounter
 {

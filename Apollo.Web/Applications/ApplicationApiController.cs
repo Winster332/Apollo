@@ -96,6 +96,18 @@ namespace Apollo.Web.Applications
 			To = to;
 		}
 	}
+	
+	public class PlanListUiQuery
+	{
+		public Date From { get; }
+		public Date To { get; }
+
+		public PlanListUiQuery(Date from, Date to)
+		{
+			From = from;
+			To = to;
+		}
+	}
 
 	public class FilterApplicationPagedUiQuery
 	{

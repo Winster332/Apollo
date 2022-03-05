@@ -11,16 +11,27 @@ export interface ServerError extends Error {
 }
 
 export class HttpService {
-	constructor() {
+	constructor(userLoader: boolean = true) {
 		makeObservable(this);
+		
+		this.isNeedUseLoader = userLoader;
 	}
+	
+	private isNeedUseLoader: boolean;
 
 	public post = (path: string, data: any) => {
 		return this.send(path, data, 'post');
 	};
-
+	
 	private send = (path: string, data: any, method: 'get' | 'post' | 'put' | 'delete' | 'head') => {
-		return CommonStore.instance.loaderStore.addLoader(new Promise<any>((resolve, reject) => {
+		if (this.isNeedUseLoader) {
+			return CommonStore.instance.loaderStore.addLoader(this.promiseSender(path, data, method));
+		}
+		return this.promiseSender(path, data, method);
+	};
+	
+	private promiseSender = (path: string, data: any, method: 'get' | 'post' | 'put' | 'delete' | 'head') => {
+		return new Promise<any>((resolve, reject) => {
 			const xhr = new XMLHttpRequest();
 			xhr.open(method.toUpperCase(), path, true);
 			xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -46,7 +57,7 @@ export class HttpService {
 				reject(new Error('Network Error'));
 			};
 			xhr.send(typeof data === 'string' ? data : JSON.stringify(data));
-		}));
+		})
 	};
 
 	@observable

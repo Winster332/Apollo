@@ -50,6 +50,7 @@ namespace Apollo.Domain.Accounts.Role
 						
 						RoleAccessId.IntegrationList,
 						RoleAccessId.PeopleList,
+						RoleAccessId.ReportPlan,
 					}),
 
 				new(

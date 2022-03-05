@@ -13,6 +13,7 @@ export type AppNames =
 	'ReportsDifferenceReportApp' |
 	'ReportsFromAdsApp' |
 	'ReportsFromSiteApp' |
+	'ReportsPlanApp' |
 	'UsersListApp' |
 	'UsersRolesListApp' |
 	'UsersRolesRoleApp';

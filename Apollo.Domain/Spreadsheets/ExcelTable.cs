@@ -143,4 +143,14 @@ namespace Apollo.Domain.Spreadsheets
 			return memoryStream.ToArray();
 		}
 	}
+
+	public static class ExcelPackageExt
+	{
+		public static byte[] ToBytes(this ExcelPackage package)
+		{
+			using var memoryStream = new MemoryStream();
+			package.SaveAs(memoryStream);
+			return memoryStream.ToArray();
+		}
+	}
 }

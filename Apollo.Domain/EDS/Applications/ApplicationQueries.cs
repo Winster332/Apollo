@@ -17,6 +17,7 @@ using Apollo.Domain.SharedKernel;
 using MongoDB.Bson;
 using Apollo.Domain.Extensions;
 using EventFlow.Core;
+using MoreLinq.Extensions;
 
 namespace Apollo.Domain.EDS.Applications
 {
@@ -238,6 +239,32 @@ namespace Apollo.Domain.EDS.Applications
 		}
 	}
 	
+	public class PlanApplicationsReportByOrganizationsQuery: ReadModelQuery<IReadOnlyCollection<ApplicationsPlanReportBySource>, ApplicationView>
+	{
+		public Date To { get; }
+		public Date From { get; }
+		public IReadOnlyCollection<ApplicationSourceId> SourceIds { get; }
+		public bool IsFilterByNullSourceId { get; }
+		
+		public PlanApplicationsReportByOrganizationsQuery(
+			Date from, Date to,
+			IReadOnlyCollection<ApplicationSourceId> sourceIds,
+			bool isFilterByNullSourceId)
+		{
+			From = from;
+			To = to;
+			SourceIds = sourceIds;
+			IsFilterByNullSourceId = isFilterByNullSourceId;
+		}
+
+		public override Task<IReadOnlyCollection<ApplicationsPlanReportBySource>> Run(
+			IMongoDbReadModelStore<ApplicationView> viewStore,
+			CancellationToken ct)
+		{
+			return null;
+		}
+	}
+	
 	public class FilterApplicationsPagedQuery: PagedQuery<ApplicationView>
 	{
 		public Maybe<string> Organization { get; }
@@ -322,6 +349,7 @@ namespace Apollo.Domain.EDS.Applications
 		IQueryHandler<ListApplicationsByPhoneQuery, IReadOnlyCollection<ApplicationView>>,
 		IQueryHandler<ListCountApplicationsByPhoneQuery, IReadOnlyCollection<PhoneBindApplicationsCounter>>,
 		IQueryHandler<ApplicationsReportByOrganizationsQuery, IReadOnlyCollection<ListReportByOrganizationWithApplications>>,
+		IQueryHandler<PlanApplicationsReportByOrganizationsQuery, IReadOnlyCollection<ApplicationsPlanReportBySource>>,
 		IQueryHandler<ListApplicationsPagedQuery, SearchResult<ApplicationView>>,
 		IQueryHandler<FilterApplicationsPagedQuery, SearchResult<ApplicationView>>,
 		IQueryHandler<ApplicationQuantityQuery, long>
@@ -446,6 +474,77 @@ namespace Apollo.Domain.EDS.Applications
 
 		public Task<IReadOnlyCollection<ApplicationView>> ExecuteQueryAsync(ListApplicationsByIdsQuery query, CancellationToken ct) =>
 			query.Run(_viewStore, ct);
+
+		public async Task<IReadOnlyCollection<ApplicationsPlanReportBySource>> ExecuteQueryAsync(
+			PlanApplicationsReportByOrganizationsQuery query, CancellationToken ct)
+		{
+			var dtFrom = query.From;
+			var dtTo = query.To;
+			
+			var collection = _mongoDatabase.GetCollection<ApplicationView>(_readModelDescriptionProvider.GetReadModelDescription<ApplicationView>().RootCollectionName.Value);
+			var expressions = new List<FilterDefinition<ApplicationView>>
+			{
+				Builders<ApplicationView>.Filter.Gte(c => c.DatePlan, dtFrom.ToMaybe()),
+				Builders<ApplicationView>.Filter.Lte(c => c.DatePlan, dtTo.ToMaybe()),
+			};
+			
+			var pipeline = collection
+				.Aggregate()
+				.Sort(Builders<ApplicationView>.Sort.Descending(c => c.DatePlan));
+			
+			if (query.SourceIds.Count != 0 || query.IsFilterByNullSourceId)
+			{
+				var filters = query.SourceIds
+					.Select(sId => sId.ToMaybe())
+					.Select(sId => Builders<ApplicationView>.Filter.Eq(x => x.SourceId, sId))
+					.ToList();
+
+				if (query.IsFilterByNullSourceId)
+				{
+					filters.Add(Builders<ApplicationView>.Filter.Eq(x => x.SourceId, Maybe<ApplicationSourceId>.Nothing));
+				}
+
+				expressions.Add(Builders<ApplicationView>.Filter.Or(filters));
+			}
+
+			if (expressions.Count != 0)
+			{
+				pipeline = pipeline
+					.Match(Builders<ApplicationView>.Filter.And(expressions));
+			}
+
+			var kl = await pipeline.ToListAsync(ct);
+
+			return kl
+				.GroupBy(x => x.SourceId)
+				.Select(g =>
+				{
+					var reports = g.GroupBy(x => x.DatePlan.Value.ToString())
+						.SelectMany(x =>
+						{
+							var date = ParseDate(x.Key);
+
+							return x
+								.GroupBy(a => a.OrganizationName)
+								.Select(a => new OrganizationWithApplicationsPlanReport(a.Key, date, a.Count()));
+						})
+						.ToReadOnly();
+
+					return new ApplicationsPlanReportBySource(g.Key, reports);
+				})
+				.ToReadOnly();
+
+			Date ParseDate(string value)
+			{
+				var parts = value.Split('-');
+
+				return new Date(
+					int.Parse(parts[0]),
+					int.Parse(parts[1]),
+					int.Parse(parts[2])
+				);
+			}
+		}
 	}
 	
 	public class ListReportByOrganizationWithApplications
@@ -469,6 +568,34 @@ namespace Apollo.Domain.EDS.Applications
 
 		public OrganizationWithApplicationsReport(Maybe<string> organization, int applicationsCount)
 		{
+			Organization = organization;
+			ApplicationsCount = applicationsCount;
+		}
+	}
+
+	public class ApplicationsPlanReportBySource
+	{
+		public Maybe<ApplicationSourceId> SourceId { get; }
+		public IReadOnlyCollection<OrganizationWithApplicationsPlanReport> Reports { get; }
+
+		public ApplicationsPlanReportBySource(
+			Maybe<ApplicationSourceId> sourceId,
+			IReadOnlyCollection<OrganizationWithApplicationsPlanReport> reports)
+		{
+			SourceId = sourceId;
+			Reports = reports;
+		}
+	}
+
+	public class OrganizationWithApplicationsPlanReport
+	{
+		public Maybe<string> Organization { get; }
+		public int ApplicationsCount { get; }
+		public Date Day { get; }
+
+		public OrganizationWithApplicationsPlanReport(Maybe<string> organization, Date day, int applicationsCount)
+		{
+			Day = day;
 			Organization = organization;
 			ApplicationsCount = applicationsCount;
 		}
