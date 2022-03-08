@@ -8,7 +8,7 @@ namespace Apollo.Domain.EDS.ApplicationSources
 		{
 		}
 		
-		// public static ApplicationSourceId AdministrationId = With("applicationsource-00000000-0000-0000-0000-000000000001");
+		public static ApplicationSourceId VkId = With("applicationsource-00000000-0000-0000-0000-000000000001");
 		// public static ApplicationSourceId AdsId = With("applicationsource-00000000-0000-0000-0000-000000000002");
 		// public static ApplicationSourceId PortalOurStPetersburgId = With("applicationsource-00000000-0000-0000-0000-000000000003");
 		// public static ApplicationSourceId HousingCommitteeId = With("applicationsource-00000000-0000-0000-0000-000000000004");

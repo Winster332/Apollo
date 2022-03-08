@@ -44,13 +44,14 @@ namespace Apollo.Domain.Accounts.Role
 						RoleAccessId.ApplicationCategoryList,
 						RoleAccessId.UserList,
 						RoleAccessId.ReportFromSite,
-						RoleAccessId.ReportFromVk,
+						RoleAccessId.ReportByOrganization,
 						RoleAccessId.ReportDifference,
 						RoleAccessId.ReportFromAds,
 						
 						RoleAccessId.IntegrationList,
 						RoleAccessId.PeopleList,
 						RoleAccessId.ReportPlan,
+						RoleAccessId.ReportByVk,
 					}),
 
 				new(

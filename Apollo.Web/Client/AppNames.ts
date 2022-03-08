@@ -13,6 +13,7 @@ export type AppNames =
 	'ReportsDifferenceReportApp' |
 	'ReportsFromAdsApp' |
 	'ReportsFromSiteApp' |
+	'ReportsFromVkApp' |
 	'ReportsPlanApp' |
 	'UsersListApp' |
 	'UsersRolesListApp' |

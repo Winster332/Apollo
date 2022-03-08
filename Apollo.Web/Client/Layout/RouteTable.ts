@@ -105,6 +105,8 @@ export class RouteTable {
 					.route('Сайт', false),
 				ReportController.plan()
 					.route('План', true),
+				ReportController.byVk()
+					.route('ВК', true),
 				ReportController.differenceList()
 					.route('Разница', true),
 				ReportController.differenceReport('')

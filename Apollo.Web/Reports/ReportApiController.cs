@@ -16,7 +16,9 @@ using EventFlow.Queries;
 using Functional.Maybe;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Apollo.Domain.EDS.ApplicationStates;
 using Apollo.Domain.EDS.Organizations;
+using ApplicationId = Apollo.Domain.EDS.Applications.ApplicationId;
 
 namespace Apollo.Web.Reports
 {
@@ -113,6 +115,40 @@ namespace Apollo.Web.Reports
 			return new PrintReportResult(blob);
 		}
 		
+		public async Task<ActionResult<ExecutionResult<int>>> SaveFromVk(SaveApplicationFromVkReportCommandUI cmd)
+		{
+			var items = cmd.ApplicationExternalVks.Where(x => x.Vnum.Select(vnum => vnum.NotEmpty()).OrElse(false));
+			
+			foreach (var item in items)
+			{
+				var id = item.ApplicationView.Select(x => ApplicationId.With(x.Id));
+				var externalId = item.ApplicationView.Select(x => x.ExternalId).OrElse(-2);
+				await CommandBus.PublishAsync(new EnsuringApplicationCommand(
+					id,
+					externalId,
+					item.Vnum.Value,
+					item.Vnum.Value,
+					item.DatePublication.Select(x => x.AsDateTime()).OrElse(DateTime.Now),
+					item.Category,
+					Maybe<string>.Nothing, 
+					item.Executor,
+					item.Description,
+					Maybe<DateTime>.Nothing, 
+					item.Street,
+					Maybe<Date>.Nothing,
+					Maybe<short>.Nothing,
+					item.Frame,
+					item.Home,
+					Maybe<string>.Nothing,
+					ApplicationSourceId.VkId.ToMaybe(),
+					Maybe<string>.Nothing, 
+					Maybe<string>.Nothing, 
+					ApplicationStateId.EmptyId
+				));
+			}
+			return ExecutionResult<int>.Success(1);
+		}
+		
 		public async Task<ActionResult<PrintReportResult>> PlanPrintReport(PrintApplicationAdsReportCommandUI q)
 		{
 			var fileContent = await ApplicationReportGenerator.PlanQueryAsync(
@@ -137,6 +173,15 @@ namespace Apollo.Web.Reports
 		public PrintApplicationOrganizationsReportCommandUI(int year)
 		{
 			Year = year;
+		}
+	}
+	
+	public class SaveApplicationFromVkReportCommandUI
+	{
+		public IReadOnlyCollection<ApplicationExternalVk> ApplicationExternalVks { get; }
+		public SaveApplicationFromVkReportCommandUI(IReadOnlyCollection<ApplicationExternalVk> applicationExternalVks)
+		{
+			ApplicationExternalVks = applicationExternalVks;
 		}
 	}
 	

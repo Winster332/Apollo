@@ -41,7 +41,7 @@ namespace Apollo.Domain.Accounts.Role
 		/// Доступ к сводке по поставщикам
 		/// </summary>
 		public static readonly RoleAccessId ReportFromSite = With(RoleAccess.ReportFromSite);
-		public static readonly RoleAccessId ReportFromVk = With(RoleAccess.ReportFromVk);
+		public static readonly RoleAccessId ReportByOrganization = With(RoleAccess.ReportByOrganization);
 		public static readonly RoleAccessId ReportDifference = With(RoleAccess.ReportDifference);
 		public static readonly RoleAccessId ReportFromAds = With(RoleAccess.ReportFromAds);
 		
@@ -49,6 +49,7 @@ namespace Apollo.Domain.Accounts.Role
 		public static readonly RoleAccessId PeopleList = With(RoleAccess.PeopleList);
 		
 		public static readonly RoleAccessId ReportPlan = With(RoleAccess.ReportPlan);
+		public static readonly RoleAccessId ReportByVk = With(RoleAccess.ReportByVk);
 	}
 	
 	public static class RoleAccess
@@ -63,8 +64,9 @@ namespace Apollo.Domain.Accounts.Role
 		public const string ApplicationCategoryList = "roleaccess-00000000-0000-0000-0000-000000000007";
 		
 		public const string ReportFromSite = "roleaccess-00000000-0000-0000-0000-000000000008";
-		public const string ReportFromVk = "roleaccess-00000000-0000-0000-0000-000000000009";
+		public const string ReportByOrganization = "roleaccess-00000000-0000-0000-0000-000000000009";
 		public const string ReportPlan = "roleaccess-00000000-0000-0000-0000-000000000016";
+		public const string ReportByVk = "roleaccess-00000000-0000-0000-0000-000000000017";
 		public const string ReportDifference = "roleaccess-00000000-0000-0000-0000-000000000010";
 		public const string ReportFromAds = "roleaccess-00000000-0000-0000-0000-000000000011";
 		

@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apollo.Domain.Accounts.User;
 using Apollo.Domain.EDS.Addresses;
+using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.ApplicationStates;
 using Apollo.Domain.Extensions;
 using Apollo.Domain.SharedKernel;
 using Apollo.Domain.Spreadsheets;
@@ -56,6 +58,71 @@ namespace Apollo.Domain.EDS.Applications
 				}
 
 				return applicationsPreImport;
+			}
+		}
+		
+		public static async Task<ExecutionResult<IReadOnlyCollection<ApplicationExternalVk>>> ParseExcelFileFromVkAsync(IQueryProcessor queryProcessor, Stream fileStream)
+		{
+			try
+			{
+				const string sourceFromVkName = "вконтакте";
+				var applicationViews =
+					(await queryProcessor.ProcessAsync(new ListApplicationsQuery(Maybe<DateTime>.Nothing,
+						Maybe<DateTime>.Nothing)));
+					// .Where(x => x.SourceId == ApplicationSourceId.VkId.ToMaybe());
+				var applicationViewGetterByVNum = MaybeFunctionalWrappers.Wrap<string, ApplicationView>(
+					applicationViews.GroupBy(x => x.Number).Select(x => x.First()).ToDictionary(c => c.Number.ToLower()).TryGetValue
+				);
+				
+				var applicationExternals = new List<ApplicationExternalVk>();
+				var workbook = Workbook.FromFile(fileStream);
+
+				workbook.Sheets.FirstMaybe().Do(x =>
+				{
+					var sheet = x.Value.Skip(3).Skip(983);
+			
+					foreach (var row in sheet)
+					{
+						var vnum = row[0].Where(x => x.NotEmpty());
+						var category = row[1];
+						var source = row[2].Select(sourceName => sourceName.Trim().ToLower() == sourceFromVkName).OrElse(false) 
+							? ApplicationSourceId.VkId.ToMaybe() 
+							: Maybe<ApplicationSourceId>.Nothing;
+						var publicationDate = row[3].Select(Date.Parse);
+						var street = row[4];
+						var home = row[5];
+						var frame = row[6];
+						var fio = row[7];
+						var description = row[8];
+						var executor = row[9];
+						var contractor = row[10];
+						var status = row[11];
+
+						var internalApplicationView = vnum.Select(v => applicationViewGetterByVNum(v.Trim().ToLower())).Collapse();
+			
+						applicationExternals.Add(new ApplicationExternalVk(
+							internalApplicationView,
+							vnum,
+							category,
+							source,
+							publicationDate,
+							street,
+							home,
+							frame,
+							fio,
+							description,
+							executor,
+							contractor,
+							status
+						));
+					}
+				});
+				
+				return applicationExternals.ToReadOnly().AsSuccess();
+			}
+			catch (Exception ex)
+			{
+				return ExecutionResult<IReadOnlyCollection<ApplicationExternalVk>>.Failure("Не удалось разобрать данные из файла");
 			}
 		}
 		
@@ -176,6 +243,53 @@ namespace Apollo.Domain.EDS.Applications
 			Id = id;
 			Full = full;
 			CorrelateId = correlateId;
+		}
+	}
+	
+	public class ApplicationExternalVk : ValueObject
+	{
+		public Maybe<ApplicationView> ApplicationView { get; }
+		public Maybe<string> Vnum { get; }
+		public Maybe<string> Category { get; }
+		public Maybe<ApplicationSourceId> SourceId { get; }
+		public Maybe<Date> DatePublication { get; }
+		public Maybe<string> Street { get; }
+		public Maybe<string> Home { get; }
+		public Maybe<string> Frame { get; }
+		public Maybe<string> Fio { get; }
+		public Maybe<string> Description { get; }
+		public Maybe<string> Executor { get; }
+		public Maybe<string> Contractor { get; }
+		public Maybe<string> Status { get; }
+
+		public ApplicationExternalVk(
+			Maybe<ApplicationView> applicationView,
+			Maybe<string> vnum,
+			Maybe<string> category,
+			Maybe<ApplicationSourceId> sourceId,
+			Maybe<Date> datePublication,
+			Maybe<string> street,
+			Maybe<string> home,
+			Maybe<string> frame,
+			Maybe<string> fio,
+			Maybe<string> description,
+			Maybe<string> executor,
+			Maybe<string> contractor,
+			Maybe<string> status)
+		{
+			ApplicationView = applicationView;
+			Vnum = vnum;
+			Category = category;
+			SourceId = sourceId;
+			DatePublication = datePublication;
+			Street = street;
+			Home = home;
+			Frame = frame;
+			Fio = fio;
+			Description = description;
+			Executor = executor;
+			Contractor = contractor;
+			Status = status;
 		}
 	}
 

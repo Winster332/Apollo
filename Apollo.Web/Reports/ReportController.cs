@@ -14,6 +14,7 @@ using Apollo.Domain.Extensions;
 using Apollo.Domain.Reports;
 using Apollo.Domain.Reports.DifferenceReport;
 using Apollo.Domain.SharedKernel;
+using Apollo.Web.Files;
 using Apollo.Web.Infrastructure;
 using Apollo.Web.Infrastructure.React;
 using Apollo.Web.Organizations;
@@ -21,6 +22,7 @@ using DeviceDetectorNET;
 using EventFlow;
 using EventFlow.Queries;
 using Functional.Maybe;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace Apollo.Web.Reports
@@ -75,11 +77,19 @@ namespace Apollo.Web.Reports
 		});
 		
 		
-		[AccessEndpoint(RoleAccess.ReportFromVk)]
+		[AccessEndpoint(RoleAccess.ReportByOrganization)]
 		public Task<TypedResult<ReportsApplicationsByOrganizationsAppSettings>> ByOrganizations(int year) => Authenticated(async () =>
 		{
 			var report = await QueryProcessor.ProcessAsync(new ApplicationsReportByOrganizationsQuery(year));
 			return await React(new ReportsApplicationsByOrganizationsAppSettings(report, year));
+		});
+		
+		[AccessEndpoint(RoleAccess.ReportByVk)]
+		public Task<TypedResult<ReportsFromVkAppSettings>> ByVk() => Authenticated(async () =>
+		{
+			var sourceViews = await QueryProcessor.ProcessAsync(new ListApplicationSourceQuery());
+			
+			return await React(new ReportsFromVkAppSettings(sourceViews, Array.Empty<ApplicationExternalVk>()));
 		});
 		
 		[AccessEndpoint(RoleAccess.ReportPlan)]
@@ -100,6 +110,23 @@ namespace Apollo.Web.Reports
 				to.AsDateTime()
 			));
 		});
+		
+		[PreventTypingsCreation]
+		[HttpPost]
+		[DisableRequestSizeLimit]
+		[RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
+		public async Task<ActionResult<ExecutionResult<IReadOnlyCollection<ApplicationExternalVk>>>> UploadApplicationsFromVk(FileUploadParameters parameters)
+		{
+			var applicationExternals = await ApplicationImportService.ParseExcelFileFromVkAsync(QueryProcessor, parameters.File.OpenReadStream());
+			// var applicationsForImports = await applicationExternals.Result
+			// 	.SelectAsync(externals => ApplicationImportService.GetPreImportApplicationsAsync(
+			// 		QueryProcessor,
+			// 		externals
+			// 	))
+			// 	.OrElse(() => ExecutionResult<IReadOnlyCollection<ApplicationImportItem>>.Failure(applicationExternals.Error.OrElse(() => Error.Create("Ошибка импорта"))));
+		
+			return applicationExternals;
+		}
 	}
 	
 	public record ReportsFromSiteAppSettings();
@@ -116,4 +143,5 @@ namespace Apollo.Web.Reports
 	public record ReportsDifferenceListAppSettings(SearchResult<DiffReportView> SearchResultReportViews);
 	public record ReportsDifferenceReportAppSettings(DiffReportView ReportView, IReadOnlyCollection<ApplicationView> ApplicationViews);
 	public record ReportsApplicationsByOrganizationsAppSettings(IReadOnlyCollection<ListReportByOrganizationWithApplications> Report, int CurrentYear);
+	public record ReportsFromVkAppSettings(IReadOnlyCollection<ApplicationSourceView> SourceViews, IReadOnlyCollection<ApplicationExternalVk> ApplicationExternalVks);
 }
