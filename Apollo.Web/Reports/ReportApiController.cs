@@ -32,7 +32,7 @@ namespace Apollo.Web.Reports
 		
 		public Task<ActionResult<SearchResult<ApplicationView>>> List(ListApplicationPagedUiQuery query)
 			=> QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing))
+				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing))
 				.AsActionResult();
 		
 		public Task<ActionResult<SearchResult<ApplicationView>>> FilterApplications(FilterApplicationPagedUiQuery query)
@@ -56,7 +56,7 @@ namespace Apollo.Web.Reports
 				query.Search,
 				query.DateFrom,
 				query.DateTo,
-				sourceFilter), CancellationToken.None);
+				sourceFilter, Maybe<SortQuery>.Nothing), CancellationToken.None);
 
 			return searchResultApplicationViews;
 		}

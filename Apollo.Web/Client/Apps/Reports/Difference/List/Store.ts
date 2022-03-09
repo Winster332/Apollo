@@ -78,7 +78,8 @@ export class Store {
 				size: this.pagination.currentRowsPerPage,
 				search: null,
 				dateFrom: null,
-				dateTo: null
+				dateTo: null,
+				sort: null
 			}))
 			.then(r => {
 				this.searchResultReportViews = r;

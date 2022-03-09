@@ -22,7 +22,7 @@ namespace Apollo.Web.Applications
 	{
 		public Task<ActionResult<SearchResult<ApplicationView>>> List(ListApplicationPagedUiQuery query)
 			=> QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing))
+				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, query.Sort))
 				.AsActionResult();
 		
 		// public async Task<ActionResult<ExecutionResult<int>>> CommitImport(CommitApplicationImportCommandUI cmd) =>
@@ -127,7 +127,7 @@ namespace Apollo.Web.Applications
 			Month = month;
 		}
 	}
-
+	
 	public class ListApplicationPagedUiQuery
 	{
 		public int Page { get; }
@@ -135,9 +135,11 @@ namespace Apollo.Web.Applications
 		public Maybe<DateTime> DateFrom { get; }
 		public Maybe<DateTime> DateTo { get; }
 		public Maybe<string> Search { get; }
+		public Maybe<SortQuery> Sort { get; }
 		
-		public ListApplicationPagedUiQuery(int page, int size, Maybe<string> search, Maybe<DateTime> dateFrom, Maybe<DateTime> dateTo)
+		public ListApplicationPagedUiQuery(int page, int size, Maybe<string> search, Maybe<DateTime> dateFrom, Maybe<DateTime> dateTo, Maybe<SortQuery> sort)
 		{
+			Sort = sort;
 			Page = page;
 			Size = size;
 			Search = search;

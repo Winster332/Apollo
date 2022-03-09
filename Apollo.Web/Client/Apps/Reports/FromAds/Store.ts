@@ -105,7 +105,8 @@ export class Store {
 				size: this.pagination.currentRowsPerPage,
 				search: this.filterStore.text.replace(' ', '').length === 0 ? null : this.filterStore.text,
 				dateFrom: this.filterStore.from,
-				dateTo: this.filterStore.to
+				dateTo: this.filterStore.to,
+				sort: null
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

@@ -1,15 +1,17 @@
-import { Collections } from '@Shared/Collections';
+import {Collections} from '@Shared/Collections';
 import {
 	ApplicationApiControllerProxy,
 	IAddressView,
 	IApplicationsListAppSettings,
 	IApplicationView,
-	IDescribeApplicationCommand, ILineDiagramDate,
+	IDescribeApplicationCommand,
+	ILineDiagramDate,
 	ISearchResult,
-	PeopleController
+	ISortQuery,
+	PeopleController,
 } from '@Shared/Contracts';
-import { HttpService } from '@Shared/HttpService';
-import { computed, makeObservable, observable } from 'mobx';
+import {HttpService} from '@Shared/HttpService';
+import {computed, makeObservable, observable} from 'mobx';
 import {ApplicationFilterStore} from "./Filter";
 import {CommandStore} from "@Shared/CommandStore";
 import {CommonStore} from "@Layout";
@@ -40,6 +42,7 @@ export class Store {
 			changedPage: this.changePage,
 			changedRowsPerPage: this.changeRowsPerPage
 		});
+		this.sorting = null;
 		this.applicationCardStore = new ApplicationCardStore([], [])//this.applicationStatusViews, this.applicationCategoryViews, this.addressViews
 	}
 
@@ -80,6 +83,14 @@ export class Store {
 			.value();
 	}
 
+	@observable
+	public sorting: ISortQuery | null;
+	
+	public sort = (sorting: ISortQuery) => {
+		this.sorting = sorting;
+		this.refresh();
+	};
+	
 	@observable
 	public pagination: Pagination;
 	// @observable
@@ -211,7 +222,8 @@ export class Store {
 				size: this.pagination.currentRowsPerPage,
 				search: this.filterStore.text.replace(' ', '').length === 0 ? null : this.filterStore.text,
 				dateFrom: null,
-				dateTo: null
+				dateTo: null,
+				sort: this.sorting
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

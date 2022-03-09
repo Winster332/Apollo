@@ -68,4 +68,22 @@ namespace Apollo.Domain.Extensions
 			TotalCount = totalCount;
 		}
 	}
+	
+	public enum SortQueryType
+	{
+		Desc,
+		Asc
+	}
+	
+	public class SortQuery
+	{
+		public string Field { get; }
+		public SortQueryType Type { get; }
+
+		public SortQuery(string field, SortQueryType type)
+		{
+			Field = field;
+			Type = type;
+		}
+	}
 }

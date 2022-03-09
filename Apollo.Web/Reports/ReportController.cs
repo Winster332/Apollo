@@ -44,7 +44,7 @@ namespace Apollo.Web.Reports
 		[AccessEndpoint(RoleAccess.ReportFromAds)]
 		public Task<TypedResult<ReportsFromAdsAppSettings>> FromAds() => Authenticated(async () =>
 		{
-			var searchResultApplicationViews = await QueryProcessor.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing), CancellationToken.None);
+			var searchResultApplicationViews = await QueryProcessor.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing), CancellationToken.None);
 			var applicationSourceViews = await QueryProcessor.ProcessAsync(new ListApplicationSourceQuery());
 			var addressViews = await QueryProcessor.ProcessAsync(new ListAddressQuery());
 			var organizationViews = await QueryProcessor.ProcessAsync(new ListOrganizationsQuery());

@@ -305,8 +305,13 @@ namespace Apollo.Domain.EDS.Applications
 		public int Page { get; }
 		public int PageSize { get; }
 		public Maybe<IReadOnlyCollection<ApplicationSourceId>> SourceIds { get; }
+		public Maybe<SortQuery> Sorting { get; }
 		public ListApplicationsPagedQuery(
-			int pageIndex, int pageSize, Maybe<string> searchText, Maybe<DateTime> appealDateTimeFrom, Maybe<DateTime> appealDateTimeTo, Maybe<IReadOnlyCollection<ApplicationSourceId>> sourceIds): base(pageSize, pageIndex)
+			int pageIndex, int pageSize,
+			Maybe<string> searchText,
+			Maybe<DateTime> appealDateTimeFrom, Maybe<DateTime> appealDateTimeTo,
+			Maybe<IReadOnlyCollection<ApplicationSourceId>> sourceIds,
+			Maybe<SortQuery> sorting): base(pageSize, pageIndex)
 		{
 			SearchText = searchText;
 			AppealDateTimeFrom = appealDateTimeFrom;
@@ -314,6 +319,7 @@ namespace Apollo.Domain.EDS.Applications
 			Page = pageIndex;
 			PageSize = pageSize;
 			SourceIds = sourceIds;
+			Sorting = sorting;
 		}
 
 		public override Task<SearchResult<ApplicationView>> Run(
@@ -401,9 +407,14 @@ namespace Apollo.Domain.EDS.Applications
 				}));
 			});
 
+			var sorting = query.Sorting
+				.Select(s => s.Type == SortQueryType.Desc
+					? Builders<ApplicationView>.Sort.Descending(s.Field)
+					: Builders<ApplicationView>.Sort.Ascending(s.Field))
+				.OrElse(Builders<ApplicationView>.Sort.Descending(x => x.AppealDateTime));
 			var pipeline = collection
 				.Aggregate()
-				.Sort(Builders<ApplicationView>.Sort.Descending(c => c.AppealDateTime));
+				.Sort(sorting);
 
 			if (expressions.Count != 0)
 			{

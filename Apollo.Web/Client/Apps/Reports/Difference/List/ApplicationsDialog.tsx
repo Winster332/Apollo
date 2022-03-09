@@ -77,7 +77,8 @@ export class ApplicationsDialogStore {
 				size: this.pagination.currentRowsPerPage,
 				dateFrom: this.filter.from,
 				dateTo: this.filter.to,
-				search: null
+				search: null,
+				sort: null
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

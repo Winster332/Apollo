@@ -43,6 +43,12 @@ export const createDarkMaterialUITheme: () => Theme = () => createMuiTheme({
 		}
 	},
 	overrides: {
+		MuiAppBar: {
+			colorPrimary: {
+				backgroundColor: '#424242'
+			}
+			// : '';
+		},
 		MuiTableRow: {
 			root: {
 				'&:last-child td': {
@@ -51,7 +57,6 @@ export const createDarkMaterialUITheme: () => Theme = () => createMuiTheme({
 			}
 		},
 		MuiButton: {
-
 			root: {
 				outlinedPrimary: {
 					color: '#ccc'

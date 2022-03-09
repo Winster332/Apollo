@@ -1,5 +1,5 @@
 import {
-	Box, Button, Card, CardContent,
+	Box, Card, CardContent,
 	Grid,
 	Typography,
 } from '@material-ui/core';
@@ -11,7 +11,6 @@ import {Store} from './Store';
 import {ApplicationFilter} from "./Filter";
 import {ApplicationList} from "./List";
 import {ApplicationEditor} from "./Editor";
-import GetAppIcon from '@material-ui/icons/GetApp';
 import {ApplicationCard} from "./Card";
 import {MyResponsiveLine} from "@Shared/Charts/MyResponsiveLine";
 import styled from "styled-components";
@@ -27,27 +26,24 @@ const ApplicationListApp = observer((props: IApplicationsListAppSettings) => {
 		<Grid item xs={12}>
 			<Grid item xs={12} style={{display: 'flex'}}>
 				<Box p={1}>
-					<Button variant='contained' color='primary' style={{marginLeft: '10px'}} onClick={() => store.downloadReport()}>
-						<GetAppIcon style={{marginRight: '10px'}}/>
-						Выгрузить
-					</Button>
-					{/*<Button variant='contained' color='primary' style={{marginLeft: '10px'}} onClick={() => Router().go(ApplicationController.import())}>*/}
-					{/*	<ImportExportIcon style={{marginRight: '10px'}}/>*/}
-					{/*	Импортировать*/}
-					{/*</Button>*/}
-				</Box>
-				<Box p={1} style={{marginLeft: 'auto'}}>
+				{/*	/!*<Button variant='contained' color='primary' style={{marginLeft: '10px'}} onClick={() => Router().go(ApplicationController.import())}>*!/*/}
+				{/*	/!*	<ImportExportIcon style={{marginRight: '10px'}}/>*!/*/}
+				{/*	/!*	Импортировать*!/*/}
+				{/*	/!*</Button>*!/*/}
+				{/*</Box>*/}
+				{/*<Box p={1} style={{marginLeft: 'auto'}}>*/}
 					<ApplicationFilter store={store.filterStore} onSearch={() => store.refresh()}/>
 				</Box>
 			</Grid>
 		</Grid>
 		<Grid item xs={12}>
-			<Box p={1}>
+			<Box>
 				{store.searchResultApplicationViews.pageOfItems.length === 0
 					? <Box p={2}>
 						<Typography variant='h5' align='center' style={{color: '#ccc'}}>Список пуст</Typography>
 					</Box>
 					: <ApplicationList
+						onSort={store.sort}
 						pagination={store.pagination}
 						applications={store.sortedApplications}
 						onPeopleOpen={store.openPeople}
