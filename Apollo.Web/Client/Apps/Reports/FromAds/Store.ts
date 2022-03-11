@@ -8,6 +8,7 @@ import {makeObservable, observable} from "mobx";
 import {Pagination} from "../../Addresses/List/Store";
 import {HttpService} from "@Shared/HttpService";
 import {ApplicationFilterStore} from "./Filter";
+import {CommonStore} from "@Layout";
 
 export class Store {
 	private service = new ReportApiControllerProxy(new HttpService());
@@ -68,6 +69,7 @@ export class Store {
 				from: this.filterStore.from,
 				to: this.filterStore.to,
 			}))
+			.then(CommonStore.instance.handleError)
 			.then(r => {
 				const link = document.createElement('a');
 				link.href = `data:${r.blob.contentType};base64,${encodeURI(r.blob.fileContents)}`;

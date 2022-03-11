@@ -235,11 +235,17 @@ export class ReportApiControllerProxy
 		return this.http.post('/api/ReportApi/ByOrganizationsPrintReport', params)
 			.then((response: { data: any }) => { return fromServer(response.data) as IPrintReportResult; });
 	}
-	public adsPrintReport(q: IPrintApplicationAdsReportCommandUI) : Promise<IPrintReportResult>
+	public adsPrintReport(q: IPrintApplicationAdsReportCommandUI) : Promise<IExecutionResult<IPrintReportResult>>
 	{
 		const params = { 'q': fromClient(q) };
 		return this.http.post('/api/ReportApi/AdsPrintReport', params)
-			.then((response: { data: any }) => { return fromServer(response.data) as IPrintReportResult; });
+			.then((response: { data: any }) => { return fromServer(response.data) as IExecutionResult<IPrintReportResult>; });
+	}
+	public saveFromVk(cmd: ISaveApplicationFromVkReportCommandUI) : Promise<IExecutionResult<number>>
+	{
+		const params = { 'cmd': fromClient(cmd) };
+		return this.http.post('/api/ReportApi/SaveFromVk', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as IExecutionResult<number>; });
 	}
 	public planPrintReport(q: IPrintApplicationAdsReportCommandUI) : Promise<IPrintReportResult>
 	{
@@ -305,6 +311,15 @@ export class ReportController
 			}
 		);
 	}
+	public static byVk() : LocationDescriptor<'ReportsFromVkApp'>
+	{
+		return new LocationDescriptor(
+			'ReportsFromVkApp',
+			'roleaccess-00000000-0000-0000-0000-000000000017',
+			'/report/byvk',
+			{}
+		);
+	}
 	public static plan() : LocationDescriptor<'ReportsPlanApp'>
 	{
 		return new LocationDescriptor(
@@ -327,6 +342,10 @@ export interface IPrintApplicationAdsReportCommandUI
 {
 	from: (dayjs.Dayjs | null);
 	to: (dayjs.Dayjs | null);
+}
+export interface ISaveApplicationFromVkReportCommandUI
+{
+	applicationExternalVks: IApplicationExternalVk[];
 }
 export interface IReportsFromSiteAppSettings
 {
@@ -356,6 +375,12 @@ export interface IReportsApplicationsByOrganizationsAppSettings
 	equalityContract: any;
 	report: IListReportByOrganizationWithApplications[];
 	currentYear: number;
+}
+export interface IReportsFromVkAppSettings
+{
+	equalityContract: any;
+	sourceViews: IApplicationSourceView[];
+	applicationExternalVks: IApplicationExternalVk[];
 }
 export interface IReportsPlanAppSettings
 {
@@ -640,6 +665,7 @@ export interface IListApplicationPagedUiQuery
 	dateFrom: (dayjs.Dayjs | null);
 	dateTo: (dayjs.Dayjs | null);
 	search: (string | null);
+	sort: (ISortQuery | null);
 }
 export interface IFilterApplicationPagedUiQuery
 {
@@ -1359,10 +1385,19 @@ export interface IDeleteRoleCommand
 {
 	id: string;
 }
+export interface ISortQuery
+{
+	field: string;
+	type: SortQueryType;
+}
 export interface ISearchResult<T>
 {
 	pageOfItems: T[];
 	totalCount: number;
+}
+export enum SortQueryType { 
+	Desc = 0, 
+	Asc = 1
 }
 export interface IApplicationView extends IMongoDbReadModel
 {
@@ -1396,6 +1431,22 @@ export interface IOrganizationWithApplicationsPlanReport
 	organization: (string | null);
 	applicationsCount: number;
 	day: dayjs.Dayjs;
+}
+export interface IApplicationExternalVk extends IValueObject
+{
+	applicationView: (IApplicationView | null);
+	vnum: (string | null);
+	category: (string | null);
+	sourceId: (string | null);
+	datePublication: (dayjs.Dayjs | null);
+	street: (string | null);
+	home: (string | null);
+	frame: (string | null);
+	fio: (string | null);
+	description: (string | null);
+	executor: (string | null);
+	contractor: (string | null);
+	status: (string | null);
 }
 export interface IPhoneBindApplicationsCounter
 {

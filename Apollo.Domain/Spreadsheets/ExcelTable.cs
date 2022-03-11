@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using MoreLinq;
@@ -72,7 +73,10 @@ namespace Apollo.Domain.Spreadsheets
 
 		public ExcelTable Bold(params int[] indexes)
 		{
-			indexes.ForEach(index => _worksheet.Cells[_rowIndex - 1, index].Style.Font.Bold = true);
+			indexes.ForEach(index =>
+			{
+				_worksheet.Cells[_rowIndex - 1, index].Style.Font.Bold = true;
+			});
 			return this;
 		}
 

@@ -100,19 +100,22 @@ namespace Apollo.Web.Reports
 			return new PrintReportResult(blob);
 		}
 		
-		public async Task<ActionResult<PrintReportResult>> AdsPrintReport(PrintApplicationAdsReportCommandUI q)
+		public async Task<ActionResult<ExecutionResult<PrintReportResult>>> AdsPrintReport(PrintApplicationAdsReportCommandUI q)
 		{
 			var fileContent = await ApplicationReportGenerator.AdsQueryAsync(
 				QueryProcessor,
 				q.From,
 				q.To
 			);
-			var blob = new FileContentResult(
-				fileContent,
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-			);
-			
-			return new PrintReportResult(blob);
+
+			if (fileContent.Error.IsSomething()) return ExecutionResult<PrintReportResult>.Failure(fileContent.Error.Value);
+
+			return new PrintReportResult(
+				new FileContentResult(
+					fileContent.Result.OrElse(Array.Empty<byte>()),
+					"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+				)
+			).AsSuccess();
 		}
 		
 		public async Task<ActionResult<ExecutionResult<int>>> SaveFromVk(SaveApplicationFromVkReportCommandUI cmd)

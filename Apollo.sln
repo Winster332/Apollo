@@ -8,11 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollo.Domain", "Apollo.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollo.Infrastructure.Tests", "Apollo.Infrastructure.Tests\Apollo.Infrastructure.Tests.csproj", "{0023B13A-09A1-443C-B600-C64F9632C02D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{43589E70-FAFC-4C41-96B1-B14F2B1FDAEB}"
-ProjectSection(SolutionItems) = preProject
-	Dockerfile = Dockerfile
-EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollo.Domain.Tests", "Apollo.Domain.Tests\Apollo.Domain.Tests.csproj", "{9E3A7DA1-F8C2-4D64-9B2E-0B0C75AA63E4}"
 EndProject
 Global

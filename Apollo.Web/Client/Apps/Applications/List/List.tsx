@@ -164,6 +164,7 @@ export const FlexTable = observer((props: ({
 	header: FlexHeaderProps[];
 	data: FlexTableData;
 	selectable?: boolean;
+	onImport: () => void;
 })) => {
 	const headerStore = React.useState(() => new FlexTableHeaderStore(props.onSort, props.header))[0];
 	const pagination = props.pagination;
@@ -204,7 +205,7 @@ export const FlexTable = observer((props: ({
 					<Box style={{display: 'flex'}}>
 						<FlexTablePagination pagination={pagination}/>
 
-						<Button variant='contained' color='primary' style={{marginLeft: 'auto'}} onClick={() => console.log('123')}>
+						<Button variant='contained' color='primary' style={{marginLeft: 'auto'}} onClick={() => props.onImport()}>
 							{/*store.downloadReport()*/}
 							<GetAppIcon/>
 						</Button>
@@ -293,6 +294,7 @@ export const ApplicationList = observer((props: ({
 	onPeopleOpen: (phoneNumber: string) => void;
 	pagination: Pagination;
 	onSort: (sorting: ISortQuery) => void;
+	onImport: () => void;
 })) => {
 	const pagination = props.pagination;
 	
@@ -314,7 +316,7 @@ export const ApplicationList = observer((props: ({
 		x.applicationView.cause
 	])
 	
-	return <FlexTable data={kk} selectable onSort={props.onSort} onEdit={props.onEdit} pagination={pagination} header={header}/>
+	return <FlexTable onImport={props.onImport} data={kk} selectable onSort={props.onSort} onEdit={props.onEdit} pagination={pagination} header={header}/>
 	
 	return <Table>
 		<TableHead>

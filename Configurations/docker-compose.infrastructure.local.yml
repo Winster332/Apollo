@@ -15,9 +15,9 @@ services:
     ports:
       - 27017:27017
     restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--port", "30001" ]
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--port", "27017" ]
 
 networks:
     apollo-net-ext:
         external:
-            name: super-test
+            name: apollo-net

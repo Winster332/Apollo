@@ -30,6 +30,10 @@ yarn watch
 ```
 
 ### Docker
+
+Volumes: 
+.Apollo\Configurations
+
 Infrastructure
 ```
 docker-compose -d Configurations/docker-compose.infrastructure.local.yaml up

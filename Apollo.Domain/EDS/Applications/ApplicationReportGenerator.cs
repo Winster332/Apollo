@@ -141,8 +141,12 @@ namespace Apollo.Domain.EDS.Applications
 			}
 		}
 		
-		public static async Task<byte[]> AdsQueryAsync(IQueryProcessor queryProcessor, Maybe<DateTime> from, Maybe<DateTime> to)
+		public static async Task<ExecutionResult<byte[]>> AdsQueryAsync(IQueryProcessor queryProcessor, Maybe<DateTime> from, Maybe<DateTime> to)
 		{
+			if (from.IsNothing() || to.IsNothing())
+			{
+				return ExecutionResult<byte[]>.Failure("Не заданы пределы по датам");
+			}
 			// var organizationViews = MaybeFunctionalWrappers.Wrap<OrganizationId, OrganizationView>(
 			// 	(await queryProcessor.ProcessAsync(new ListOrganizationsQuery(), CancellationToken.None))
 			// 	.ToDictionary(c => OrganizationId.With(c.Id)).TryGetValue);
@@ -155,7 +159,7 @@ namespace Apollo.Domain.EDS.Applications
 			var addressViews = await queryProcessor.ProcessAsync(new ListAddressQuery(), CancellationToken.None);
 			var applicationSourceViews = await queryProcessor.ProcessAsync(new ListApplicationSourceQuery(), CancellationToken.None);
 			
-			using var package = new ExcelPackage();
+			var package = new ExcelPackage();
 			var worksheet = package.Workbook.Worksheets.Add("Отчет");
 			var table = new ExcelTable(worksheet, 1);
 
@@ -181,8 +185,8 @@ namespace Apollo.Domain.EDS.Applications
 				"Адрес обращения", "Тип обращения", "Причина обращения", "Сообщение", "Откуда поступила", "Организация",
 				"Подрядчик", "Сантиария"
 			};
-			table.Bold(caption.Select((_, idx) => idx+1).ToArray());
 			table.AddRow(true, true, true, caption);
+			table.Bold(caption.Select((_, idx) => idx+1).ToArray());
 			applicationViews
 				.ForEach(row =>
 				{
@@ -244,7 +248,7 @@ namespace Apollo.Domain.EDS.Applications
 			table.SetWidthColumn(115, 14);
 			table.UseFilter($"A3:N{applicationViews.Count+3}");
 			
-			return table.ToBytes(package);
+			return table.ToBytes(package).AsSuccess();
 		}
 		
 		public static async Task<byte[]> ApplicationsByOrganizationsQueryAsync(IQueryProcessor queryProcessor, int year)

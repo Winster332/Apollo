@@ -43,6 +43,7 @@ const ApplicationListApp = observer((props: IApplicationsListAppSettings) => {
 						<Typography variant='h5' align='center' style={{color: '#ccc'}}>Список пуст</Typography>
 					</Box>
 					: <ApplicationList
+						onImport={() => console.log('123')}
 						onSort={store.sort}
 						pagination={store.pagination}
 						applications={store.sortedApplications}
