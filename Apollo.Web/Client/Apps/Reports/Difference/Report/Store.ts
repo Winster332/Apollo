@@ -3,7 +3,7 @@ import {
 	IDiffReportView,
 	IReportsDifferenceReportAppSettings,
 } from '@Shared/Contracts';
-import {makeObservable, observable} from "mobx";
+import {computed, makeObservable, observable} from "mobx";
 import {Pagination} from "../../../Addresses/List/Store";
 import {Collections} from "@Shared/Collections";
 import {ImageViewerDialogStore} from "./ImageViewer";
@@ -26,7 +26,23 @@ export class Store {
 			changedRowsPerPage: this.changeRowsPerPage
 		});
 	}
+	
+	@computed
+	public get totalImages() {
+		return this.reportItems.map(x => x.item.before.photoIds.length + x.item.after.photoIds.length).reduce((a, b) => a + b, 0);
+	}
+	
+	public addLoadedImg = () => {
+		this.loadedImages += 1;
+	}
+	
+	@computed
+	public get percentage() {
+		return 100 / this.totalImages * this.loadedImages;
+	}
 
+	@observable
+	public loadedImages: number = 0;
 	public imageViewerDialogStore: ImageViewerDialogStore;
 	@observable
 	public reportView: IDiffReportView;

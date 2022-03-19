@@ -11,6 +11,7 @@ import {
 } from "@Shared/Contracts";
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import {Skeleton} from "@material-ui/lab";
 
 export class ImageViewerDialogStore {
 	constructor() {
@@ -106,7 +107,8 @@ export const ImageViewerDialog = observer((props: ({
 					<NavigateBeforeIcon/>
 				</IconButton>
 				<Box style={{display: 'flex'}}>
-					<img src={current.url} style={{margin: 'auto', maxWidth: '800px'}}/>
+					<ImageDynamic src={current.url} width={400} height={500} style={{margin: 'auto', maxWidth: '800px'}}/>
+					{/*<img src={current.url} style={{margin: 'auto', maxWidth: '800px'}}/>*/}
 				</Box>
 				<IconButton onClick={() => store.next()} style={{
 					position: 'absolute',
@@ -118,4 +120,50 @@ export const ImageViewerDialog = observer((props: ({
 			</Box>
 		</DialogContent>
 	</Dialog>
+})
+
+class ImageDynamicStore {
+	constructor(src: string) {
+		makeObservable(this)
+		
+		this.src = src;
+		this.isLoaded = false;
+	}
+	
+	public src: string;
+	
+	@observable
+	public isLoaded: boolean;
+	
+	public load = () => {
+		if (this.isLoaded) {
+			return;
+		}
+		
+		this.isLoaded = true;
+	};
+}
+
+export const ImageDynamic = observer((props: ({
+	key?: number;
+	src?: string;
+	style?: React.CSSProperties
+	width: number;
+	height: number;
+	onClick?: () => void;
+	onLoaded?: () => void;
+})) => {
+	const store = React.useState(() => new ImageDynamicStore(props.src || ''))[0];
+	
+	return <>
+		<Skeleton key={props.key} style={{display: !store.isLoaded ? 'block' : 'none', ...props.style}} variant="rect" width={props.width} height={props.height} />
+		<img onClick={props.onClick} key={props.key} src={props.src} onLoad={() => {
+			store.load();
+			
+			if (props.onLoaded !== undefined) {
+				props.onLoaded();
+			}
+		}} style={{display: store.isLoaded ? 'block' : 'none', ...props.style}}/>
+	</>
+
 })

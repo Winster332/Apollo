@@ -50,6 +50,8 @@ namespace Apollo.Domain.Accounts.Role
 		
 		public static readonly RoleAccessId ReportPlan = With(RoleAccess.ReportPlan);
 		public static readonly RoleAccessId ReportByVk = With(RoleAccess.ReportByVk);
+		public static readonly RoleAccessId CallCenter = With(RoleAccess.CallCenter);
+		public static readonly RoleAccessId Robots = With(RoleAccess.Robots);
 	}
 	
 	public static class RoleAccess
@@ -58,6 +60,7 @@ namespace Apollo.Domain.Accounts.Role
 		public const string OrganizationList = "roleaccess-00000000-0000-0000-0000-000000000002";
 		public const string AddressList = "roleaccess-00000000-0000-0000-0000-000000000003";
 		public const string ApplicationList = "roleaccess-00000000-0000-0000-0000-000000000004";
+		public const string CallCenter = "roleaccess-00000000-0000-0000-0000-000000000018";
 		public const string PeopleList = "roleaccess-00000000-0000-0000-0000-000000000015";
 		public const string RoleList = "roleaccess-00000000-0000-0000-0000-000000000005";
 		public const string UserList = "roleaccess-00000000-0000-0000-0000-000000000006";
@@ -67,6 +70,7 @@ namespace Apollo.Domain.Accounts.Role
 		public const string ReportByOrganization = "roleaccess-00000000-0000-0000-0000-000000000009";
 		public const string ReportPlan = "roleaccess-00000000-0000-0000-0000-000000000016";
 		public const string ReportByVk = "roleaccess-00000000-0000-0000-0000-000000000017";
+		public const string Robots = "roleaccess-00000000-0000-0000-0000-000000000019";
 		public const string ReportDifference = "roleaccess-00000000-0000-0000-0000-000000000010";
 		public const string ReportFromAds = "roleaccess-00000000-0000-0000-0000-000000000011";
 		

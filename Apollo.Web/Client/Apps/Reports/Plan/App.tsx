@@ -17,7 +17,7 @@ import {
 } from "@Shared/Contracts";
 import {asNumber} from "@Shared/TypographyHelpers";
 import styled from "styled-components";
-import {DatePicker} from "@Shared/DatePicker";
+import {DatePickerRange} from "@Shared/DatePicker";
 import SearchIcon from "@material-ui/icons/Search";
 import GetAppIcon from "@material-ui/icons/GetApp";
 
@@ -55,32 +55,16 @@ const ReportPlanApp = observer((props: IReportsPlanAppSettings) => {
 				/>
 			</Box>
 			<Box style={{display: 'flex', float: 'right'}} p={1}>
-				<Box style={{display: 'flex'}}>
-					<Typography variant='body2' style={{
-						lineHeight: '30px',
-						paddingRight: '10px'
-					}}>С</Typography>
-					<DatePicker
-						value={store.filterDateFrom}
-						onChange={val => {
-							if (val) {
-								store.filterDateFrom = val;
-							}
-						}}/>
-				</Box>
-				<Box style={{marginLeft: '10px', display: 'flex'}}>
-					<Typography variant='body2' style={{
-						lineHeight: '30px',
-						paddingRight: '10px'
-					}}>по</Typography>
-					<DatePicker
-						value={store.filterDateTo}
-						onChange={val => {
-							if (val) {
-								store.filterDateTo = val;
-							}
-						}}/>
-				</Box>
+				<DatePickerRange
+					valueFrom={store.filterDateFrom}
+					valueTo={store.filterDateTo}
+					onChange={(valFrom, valTo) => {
+						if (valFrom !== null && valTo !== null) {
+							store.filterDateFrom = valFrom;
+							store.filterDateTo = valTo;
+						}
+					}}
+				/>
 				<Box style={{marginLeft: '10px'}}>
 					<Button variant='contained' color='primary' onClick={store.onSearch} style={{marginLeft: '10px'}}>
 						<SearchIcon/>

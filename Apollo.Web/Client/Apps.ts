@@ -3,6 +3,7 @@ import { App as AccountLoginApp } from './Apps/Account/Login/App';
 import { App as AddressesListApp } from './Apps/Addresses/List/App';
 import { App as ApplicationCategoriesListApp } from './Apps/ApplicationCategories/List/App';
 import { App as ApplicationsListApp } from './Apps/Applications/List/App';
+import { App as CallCenterConstructorApp } from './Apps/CallCenter/Constructor/App';
 import { App as EmployeesListApp } from './Apps/Employees/List/App';
 import { App as IntegrationsListApp } from './Apps/Integrations/List/App';
 import { App as OrganizationsListApp } from './Apps/Organizations/List/App';
@@ -15,6 +16,8 @@ import { App as ReportsFromAdsApp } from './Apps/Reports/FromAds/App';
 import { App as ReportsFromSiteApp } from './Apps/Reports/FromSite/App';
 import { App as ReportsFromVkApp } from './Apps/Reports/FromVk/App';
 import { App as ReportsPlanApp } from './Apps/Reports/Plan/App';
+import { App as RobotsListApp } from './Apps/Robots/List/App';
+import { App as RobotsSchemeApp } from './Apps/Robots/Scheme/App';
 import { App as UsersListApp } from './Apps/Users/List/App';
 import { App as UsersRolesListApp } from './Apps/Users/Roles/List/App';
 import { App as UsersRolesRoleApp } from './Apps/Users/Roles/Role/App';
@@ -25,6 +28,7 @@ export const Apps = {
 	'AddressesListApp': { app: AddressesListApp, cssClass: 'AddressesList' },
 	'ApplicationCategoriesListApp': { app: ApplicationCategoriesListApp, cssClass: 'licationCategoriesListApp' },
 	'ApplicationsListApp': { app: ApplicationsListApp, cssClass: 'licationsListApp' },
+	'CallCenterConstructorApp': { app: CallCenterConstructorApp, cssClass: 'CallCenterConstructor' },
 	'EmployeesListApp': { app: EmployeesListApp, cssClass: 'EmployeesList' },
 	'IntegrationsListApp': { app: IntegrationsListApp, cssClass: 'IntegrationsList' },
 	'OrganizationsListApp': { app: OrganizationsListApp, cssClass: 'OrganizationsList' },
@@ -37,6 +41,8 @@ export const Apps = {
 	'ReportsFromSiteApp': { app: ReportsFromSiteApp, cssClass: 'ReportsFromSite' },
 	'ReportsFromVkApp': { app: ReportsFromVkApp, cssClass: 'ReportsFromVk' },
 	'ReportsPlanApp': { app: ReportsPlanApp, cssClass: 'ReportsPlan' },
+	'RobotsListApp': { app: RobotsListApp, cssClass: 'RobotsList' },
+	'RobotsSchemeApp': { app: RobotsSchemeApp, cssClass: 'RobotsScheme' },
 	'UsersListApp': { app: UsersListApp, cssClass: 'UsersList' },
 	'UsersRolesListApp': { app: UsersRolesListApp, cssClass: 'UsersRolesList' },
 	'UsersRolesRoleApp': { app: UsersRolesRoleApp, cssClass: 'UsersRolesRole' },

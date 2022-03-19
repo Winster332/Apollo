@@ -8,7 +8,6 @@ import {
 	TableHead,
 	TablePagination,
 	TableRow,
-	Typography
 } from '@material-ui/core';
 import * as React from 'react';
 import {useEffect} from 'react';
@@ -19,12 +18,10 @@ import {IReportsFromAdsAppSettings} from "@Shared/Contracts";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import {ApplicationFilter} from "./Filter";
 import styled from "styled-components";
-import {DateTimePicker} from "@Shared/DatePicker";
+import {DatePickerRange} from "@Shared/DatePicker";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import {makeObservable, observable} from "mobx";
-import {CommonStore} from "@Layout";
-import {AppTheme} from "../../../Layout/CommonStore";
 
 const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 	const store = React.useState(() => new Store(props))[0];
@@ -34,15 +31,26 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 		<Grid item xs={12} style={{
 			position: 'sticky',
 			top: '0px',
-			background: CommonStore.instance.theme.current === AppTheme.Light ? '#fafafa' : '#303030',
+			background: 'space',
 			borderBottom: '1px solid #e0e0e0'
 		}}>
 			<Grid item xs={12} style={{display: 'flex'}}>
 				<Box p={1}>
-					<Button variant='contained' color='primary' style={{marginLeft: '10px'}} onClick={() => store.exportToXlsx()}>
+					<Button variant='contained' color='primary' style={{marginLeft: '10px', marginRight: '10px'}} onClick={() => store.exportToXlsx()}>
 						<GetAppIcon style={{marginRight: '10px'}}/>
 						Выгрузить
 					</Button>
+					
+					<DatePickerRange
+						valueFrom={store.filterStore.from}
+						valueTo={store.filterStore.to}
+						onChange={(valFrom, valTo) => {
+							if (valFrom !== null && valTo !== null) {
+								store.filterStore.from = valFrom;
+								store.filterStore.to = valTo;
+							}
+						}}
+					/>
 					{/*<Button variant='contained' color='primary' style={{marginLeft: '10px'}} onClick={() => Router().go(ApplicationController.import())}>*/}
 					{/*	<ImportExportIcon style={{marginRight: '10px'}}/>*/}
 					{/*	Импортировать*/}
@@ -53,38 +61,6 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 				</Box>
 			</Grid>
 			<Grid item xs={12}>
-				<Box style={{display: 'flex', float: 'left'}} pl={2}>
-					<Box style={{display: 'flex'}}>
-						<Typography variant='body2' style={{
-							lineHeight: '30px',
-							paddingRight: '10px'
-						}}>С</Typography>
-						<DateTimePicker
-							value={store.filterStore.from}
-							// fullWidth
-							// label='Дата от'
-							onChange={val => {
-								if (val) {
-									store.filterStore.from = val;
-								}
-							}}/>
-					</Box>
-					<Box style={{marginLeft: '10px', display: 'flex'}}>
-						<Typography variant='body2' style={{
-							lineHeight: '30px',
-							paddingRight: '10px'
-						}}>по</Typography>
-						<DateTimePicker
-							value={store.filterStore.to}
-							// fullWidth
-							// label='Дата до'
-							onChange={val => {
-								if (val) {
-									store.filterStore.to = val;
-								}
-							}}/>
-					</Box>
-				</Box>
 				<Box>
 					<TablePagination
 						rowsPerPageOptions={pagination.rowsPerPageOptions}

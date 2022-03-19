@@ -41,6 +41,10 @@
 		<Content Include="Client\logo.jpg">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<None Remove="Client\Styles.css" />
+		<Content Include="Client\Styles.css">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 

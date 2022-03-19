@@ -20,7 +20,7 @@ import { LocationDescriptorSimple } from './Shared/LocationDescriptor';
 import { LoggingService } from './Shared/Logging/LoggingService';
 import { LocationObject, Router, createRouter } from './Shared/Router';
 import {createDarkMaterialUITheme, createLightMaterialUITheme} from "@Shared/createMaterialUITheme";
-import {computed, observable} from "mobx";
+import {computed, makeObservable, observable} from "mobx";
 
 type ClientProps = {
 	appName: AppNames;
@@ -29,17 +29,21 @@ type ClientProps = {
 	width?: Breakpoint;
 	user: IUserView | null;
 	counters: IQuantitativeCounter[];
+	isMobile: boolean
 };
 
 export const materialUiStylesId = 'material-ui-styles';
 
 class ClientStore {
 	constructor(props: ClientProps) {
+		makeObservable(this)
 		this.title = Apps[props.appName].app.getTitle(props.appProps);
 		this.commonStore = new CommonStore(props.appName, props.appProps, this.title, props.user, props.counters);
 		CommonStore.instance = this.commonStore;
 		this.routeTable = new RouteTable(this.commonStore);
 		this.loggingService = new LoggingService();
+		this.headerHeight = 0;
+		this.sidebarWidth = 0;
 	}
 	
 	@observable
@@ -50,6 +54,10 @@ class ClientStore {
 	public routeTable: RouteTable;
 	@observable
 	public loggingService: LoggingService;
+	@observable
+	public headerHeight: number;
+	@observable
+	public sidebarWidth: number;
 
 	@computed
 	public get materialTheme(): Theme {
@@ -83,6 +91,29 @@ export const Client = observer((props: ClientProps) => {
 		props.titleReporter(currentRoute.title);
 	}
 
+	const computeSizeByElement = (id: string) => {
+		const element = document.getElementById(id)
+
+		if (element === null) {
+			return ({
+				width: 0,
+				height: 0
+			})
+		}
+
+		const getSizeFromStyle = (style: CSSStyleDeclaration) => {
+			const width = parseFloat(style.width.replace('px', ''))
+			const height = parseFloat(style.height.replace('px', ''))
+			
+			return ({
+				width: Number.isNaN(width) ? 0 : width,
+				height: Number.isNaN(height) ? 0 : height,
+			})
+		}
+	
+		return getSizeFromStyle(window.getComputedStyle(element));
+	};
+
 	const loaderStore = commonStore.loaderStore;
 
 	React.useEffect(() => {
@@ -90,8 +121,11 @@ export const Client = observer((props: ClientProps) => {
 		if (materialUiServerStyles) {
 			materialUiServerStyles.parentNode!.removeChild(materialUiServerStyles);
 		}
-	}, []);
 
+		store.headerHeight = computeSizeByElement('app-header').height;
+		store.sidebarWidth = computeSizeByElement('app-sidebar').width;
+	}, []);
+	
 	return <MaterialThemeProvider theme={materialTheme}>
 		<StylesProvider injectFirst>
 			<ThemeProvider theme={createStyledComponentsTheme(materialTheme)}>
@@ -107,10 +141,17 @@ export const Client = observer((props: ClientProps) => {
 							loggingService={loggingService}
 							routeTable={routeTable} />
 						: <MainField>
-							<AppSwitcher
-								store={commonStore}
-								loggingService={loggingService}
-								routeTable={routeTable} />
+							<MainFieldContainer style={{
+								height: `${window.innerHeight-store.headerHeight}px`,
+								top: `${store.headerHeight}px`,
+								width: `${window.innerWidth - store.sidebarWidth}px`,
+								left: props.isMobile ? store.sidebarWidth : '0px'
+							}}>
+								<AppSwitcher
+									store={commonStore}
+									loggingService={loggingService}
+									routeTable={routeTable} />
+							</MainFieldContainer>
 						</MainField>}
 				</div>
 			</ThemeProvider>
@@ -124,11 +165,18 @@ type AppSwitcherProps = {
 	loggingService: LoggingService;
 };
 
+const MainFieldContainer = styled.div`
+    position: absolute;
+    width: 100%;
+    overflow: auto;
+`
+
 const MainField = styled.div`
 	${props => props.theme.breakpoints.up('sm')} {
 		width: calc(100% - ${props => props.theme.sidebarWidth});
 		margin-left: ${props => props.theme.sidebarWidth};
 	}
+	position: fixed;
 `;
 
 const AppSwitcher = observer((props: AppSwitcherProps) => {

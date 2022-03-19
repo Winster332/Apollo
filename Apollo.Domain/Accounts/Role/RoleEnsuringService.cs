@@ -52,6 +52,8 @@ namespace Apollo.Domain.Accounts.Role
 						RoleAccessId.PeopleList,
 						RoleAccessId.ReportPlan,
 						RoleAccessId.ReportByVk,
+						RoleAccessId.CallCenter,
+						RoleAccessId.Robots,
 					}),
 
 				new(

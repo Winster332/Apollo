@@ -1,4 +1,4 @@
-import {Badge, Collapse, Divider, Drawer, Hidden, List, ListItem, ListItemText} from '@material-ui/core';
+import {Badge, Collapse, Divider, Drawer, Hidden, List, ListItem, Typography} from '@material-ui/core';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { Router } from '@Shared/Router';
 import { observer } from 'mobx-react-lite';
@@ -50,7 +50,7 @@ const SidebarContent = observer((props: Props) => {
 	}
 	
 	return (
-		<div>
+		<div id='app-sidebar'>
 			<Header>
 				<img src='/logo.jpg' alt='Apollo'/>
 			</Header>
@@ -61,8 +61,8 @@ const SidebarContent = observer((props: Props) => {
 					.map((group) => (
 						<React.Fragment key={group.title}>
 							<ListItem button onClick={() => routeTable.toggleGroup(group.title)} >
-								<ListItemText primary={group.title} />
-								{group.active ? null : (group.expanded ? <ExpandLess /> : <ExpandMore />)}
+								<Typography variant='subtitle2'>{group.title}</Typography>
+								{group.active ? null : (group.expanded ? <ExpandLess style={{marginLeft: 'auto'}}/> : <ExpandMore  style={{marginLeft: 'auto'}}/>)}
 							</ListItem>
 							<Collapse in={group.active || group.expanded} timeout='auto' unmountOnExit>
 								<List component='div' disablePadding>

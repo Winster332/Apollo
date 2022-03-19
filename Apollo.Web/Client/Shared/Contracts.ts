@@ -191,6 +191,45 @@ export interface IUsersRolesRoleAppSettings
 	role: IRoleView;
 }
 /** Result of ApiControllerProxyGenerator activity */
+export class RobotApiControllerProxy
+{
+	public http: HttpService;
+	constructor (http: HttpService)
+	{
+		this.http = http;
+	}
+}
+/** Result of ReactControllerProxyGenerator activity */
+export class RobotController
+{
+	public static list() : LocationDescriptor<'RobotsListApp'>
+	{
+		return new LocationDescriptor(
+			'RobotsListApp',
+			'roleaccess-00000000-0000-0000-0000-000000000019',
+			'/robot/list',
+			{}
+		);
+	}
+	public static scheme() : LocationDescriptor<'RobotsSchemeApp'>
+	{
+		return new LocationDescriptor(
+			'RobotsSchemeApp',
+			'roleaccess-00000000-0000-0000-0000-000000000019',
+			'/robot/scheme',
+			{}
+		);
+	}
+}
+export interface IRobotsListAppSettings
+{
+	equalityContract: any;
+}
+export interface IRobotsSchemeAppSettings
+{
+	equalityContract: any;
+}
+/** Result of ApiControllerProxyGenerator activity */
 export class ReportApiControllerProxy
 {
 	public list(query: IListApplicationPagedUiQuery) : Promise<ISearchResult<IApplicationView>>
@@ -617,6 +656,32 @@ export interface IEmployeesListAppSettings
 	targetEmployeeId: (string | null);
 	employeeViews: IEmployeeView[];
 	userViews: IUserView[];
+}
+/** Result of ApiControllerProxyGenerator activity */
+export class CallCenterApiControllerProxy
+{
+	public http: HttpService;
+	constructor (http: HttpService)
+	{
+		this.http = http;
+	}
+}
+/** Result of ReactControllerProxyGenerator activity */
+export class CallCenterController
+{
+	public static maker() : LocationDescriptor<'CallCenterConstructorApp'>
+	{
+		return new LocationDescriptor(
+			'CallCenterConstructorApp',
+			'roleaccess-00000000-0000-0000-0000-000000000018',
+			'/callcenter/maker',
+			{}
+		);
+	}
+}
+export interface ICallCenterConstructorAppSettings
+{
+	equalityContract: any;
 }
 /** Result of ApiControllerProxyGenerator activity */
 export class ApplicationApiControllerProxy

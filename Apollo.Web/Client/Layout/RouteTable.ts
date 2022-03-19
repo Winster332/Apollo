@@ -2,10 +2,10 @@ import { Collections } from '@Shared/Collections';
 import {
 	AccountController,
 	AddressController, ApplicationCategoryController,
-	ApplicationController,
+	ApplicationController, CallCenterController,
 	CounterNames,
 	EmployeeController, IntegrationController,
-	OrganizationController, PeopleController, ReportController,
+	OrganizationController, PeopleController, ReportController, RobotController,
 	RoleController,
 	UsersController
 } from '@Shared/Contracts';
@@ -111,6 +111,16 @@ export class RouteTable {
 					.route('Разница', true),
 				ReportController.differenceReport('')
 					.route('Разница', false),
+			),
+			new RouteGroup(
+				'Боты',
+				true,
+				RobotController.list()
+					.route('Роботы', true),
+				RobotController.scheme()
+					.route('Схема', false),
+				CallCenterController.maker()
+					.route('Конструктор', true),
 			),
 			new RouteGroup(
 				'Настройки',

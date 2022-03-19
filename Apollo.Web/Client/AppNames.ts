@@ -3,6 +3,7 @@ export type AppNames =
 	'AddressesListApp' |
 	'ApplicationCategoriesListApp' |
 	'ApplicationsListApp' |
+	'CallCenterConstructorApp' |
 	'EmployeesListApp' |
 	'IntegrationsListApp' |
 	'OrganizationsListApp' |
@@ -15,6 +16,8 @@ export type AppNames =
 	'ReportsFromSiteApp' |
 	'ReportsFromVkApp' |
 	'ReportsPlanApp' |
+	'RobotsListApp' |
+	'RobotsSchemeApp' |
 	'UsersListApp' |
 	'UsersRolesListApp' |
 	'UsersRolesRoleApp';

@@ -20,8 +20,12 @@ export const createLightMaterialUITheme: () => Theme = () => createMuiTheme({
 export const createDarkMaterialUITheme: () => Theme = () => createMuiTheme({
 	palette: {
 		type: 'dark',
+		background: {
+			default: '#0a1929',
+			paper: '#0a1929'
+		},
 		primary: {
-			main: '#eba537',
+			main: '#90caf9',
 			dark: '#CCC',
 			light: '#52a0e8'
 		},
@@ -36,16 +40,17 @@ export const createDarkMaterialUITheme: () => Theme = () => createMuiTheme({
 			light: '#a25c5c'
 		},
 		text: {
-			primary: '#fff',
+			primary: 'rgb(178, 186, 194)',
 			secondary: '#fff',
 			disabled: '#ccc',
 			hint: '#fff'
 		}
 	},
+	
 	overrides: {
 		MuiAppBar: {
 			colorPrimary: {
-				backgroundColor: '#424242'
+				backgroundColor: 'rgba(10, 25, 41, 0.7)'
 			}
 			// : '';
 		},

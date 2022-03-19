@@ -1,5 +1,5 @@
 import {
-	Box, Breadcrumbs, Button, Card, CardContent, Chip, Grid,
+	Box, Breadcrumbs, Button, Card, CardContent, Chip, Grid, LinearProgress,
 	Link, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Tooltip,
 	Typography
 } from '@material-ui/core';
@@ -13,8 +13,7 @@ import {
 	IReportsDifferenceReportAppSettings
 } from "@Shared/Contracts";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import styled from "styled-components";
-import {ImageViewerDialog} from "./ImageViewer";
+import {ImageDynamic, ImageViewerDialog} from "./ImageViewer";
 import PrintIcon from "@material-ui/icons/Print";
 import {DoNotPrint} from "@Shared/DoNotPrint";
 
@@ -28,9 +27,9 @@ const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings
 			<Table stickyHeader>
 				<TableHead>
 					<TableRow>
-						<TableCell colSpan={1}>
+						<TableCell colSpan={1} style={{padding: '0px'}}>
 							<Grid container xs={12}>
-								<Grid item xs={7} style={{paddingTop: '7px'}}>
+								<Grid item xs={7} style={{padding: '16px'}}>
 									<Box style={{display: 'flex'}}>
 										<DoNotPrint>
 											<Button variant='outlined' style={{marginRight: '10px'}} onClick={() => store.print()} startIcon={<PrintIcon/>}>
@@ -42,7 +41,7 @@ const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings
 										</Box>
 									</Box>
 								</Grid>
-								<Grid item xs={5}>
+								<Grid item xs={5} style={{padding: '16px'}}>
 									<DoNotPrint>
 										<TablePagination
 											rowsPerPageOptions={pagination.rowsPerPageOptions}
@@ -59,6 +58,9 @@ const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings
 										/>
 									</DoNotPrint>
 								</Grid>
+								<Grid item xs={12}>
+									<LinearProgress style={{height: '1px'}} variant="determinate" value={store.percentage} />
+								</Grid>
 							</Grid>
 						</TableCell>
 					</TableRow>
@@ -69,7 +71,7 @@ const ReportDifferenceApp = observer((props: IReportsDifferenceReportAppSettings
 						.map((r, idx) =>
 						<TableRow key={idx}>
 							<TableCell style={{border: 'none'}}>
-								<ReportItem item={r.item} app={r.app} onView={(n) => store.viewFiles(r.item, n)}/>
+								<ReportItem onLoadedImage={() => store.addLoadedImg()} item={r.item} app={r.app} onView={(n) => store.viewFiles(r.item, n)}/>
 							</TableCell>
 						</TableRow>
 					)}
@@ -85,6 +87,7 @@ const ReportItem = observer((props: ({
 	item: IDiffReportApplication;
 	app: IApplicationView;
 	onView: (idx: number) => void;
+	onLoadedImage: () => void;
 })) => {
 	const app = props.app;
 	const item = props.item;
@@ -149,18 +152,30 @@ const ReportItem = observer((props: ({
 					}}>Ответ:</Typography>
 					<p>{app.answer}</p>
 				</Grid>
-				<Grid item xs={6}>
+				<Grid item xs={6} style={{display: 'flex'}}>
 					{item.before.photoIds.map((p, idx) =>
-						<Image key={idx} src={p.url} onClick={() => props.onView(idx)}/>
+						<ImageDynamic key={idx} onLoaded={() => props.onLoadedImage()} src={p.url} width={120} height={100} onClick={() => props.onView(idx)} style={{
+							height: '100px',
+							borderRadius: '5px',
+							boxShadow: '1px 1px 8px -2px #000',
+							margin: '5px',
+							cursor: 'pointer'
+						}}/>
 					)}
 				</Grid>
 				<Grid item xs={6}>
 					<Box>
 						{item.after.fileIds.map((f, idx) => <Link style={{marginRight: '10px'}} download target="_blank" key={idx} href={f.url}>{f.fileName}</Link>)}
 					</Box>
-					<Box>
+					<Box style={{display: 'flex'}}>
 						{item.after.photoIds.map((p, idx) =>
-							<Image key={idx} src={p.url} onClick={() => props.onView(item.before.photoIds.length+idx)}/>
+							<ImageDynamic key={idx} onLoaded={() => props.onLoadedImage()} src={p.url} width={120} height={100} onClick={() => props.onView(item.before.photoIds.length+idx)} style={{
+								height: '100px',
+								borderRadius: '5px',
+								boxShadow: '1px 1px 8px -2px #000',
+								margin: '5px',
+								cursor: 'pointer'
+							}}/>
 						)}
 					</Box>
 				</Grid>
@@ -168,16 +183,3 @@ const ReportItem = observer((props: ({
 		</CardContent>
 	</Card>
 });
-
-const Image = styled('img')`
-	height: 100px;
-    border-radius: 5px;
-    box-shadow: 1px 1px 8px -2px #000;
-    margin: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-
-    &:hover {
-    	transform: scale(1.05);
-    }
-`

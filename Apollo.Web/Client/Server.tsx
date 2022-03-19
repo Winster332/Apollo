@@ -8,7 +8,6 @@ import { Client, materialUiStylesId } from './Client';
 import { fromClient } from './Shared/ClientServerTransform';
 import { IServerProps, IUniverseState } from './Shared/Contracts';
 
-
 export const Server = (props: IServerProps) => {
 	const { appName, appProps, universeState, now, additionalScripts, clientOnly, isMobile, userView, counters } = props;
 	const materialUiSheet = new MaterialUiServerStyleSheet();
@@ -18,7 +17,8 @@ export const Server = (props: IServerProps) => {
 		appName: appName as AppNames,
 		appProps: appProps,
 		user: userView,
-		counters: counters
+		counters: counters,
+		isMobile: isMobile
 	};
 
 	let title = '';
@@ -50,6 +50,32 @@ export const Server = (props: IServerProps) => {
 				id={materialUiStylesId}
 				dangerouslySetInnerHTML={{ __html: materialUiSheet.toString() }} />
 			{styledComponentsSheet.getStyleElement()}
+			<style type='text/css'>
+				{`
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: none;
+  border-radius: 10px;
+  background: transparent;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #68686888; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #686868; 
+}
+				`}
+			</style>
 		</head>
 		<body>
 			<div id='root' dangerouslySetInnerHTML={{ __html: renderedMarkup }}></div>
