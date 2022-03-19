@@ -5,6 +5,7 @@ using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationStates;
 using Apollo.Domain.EDS.ApplicationCategories;
 using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Employees;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.Extensions;
@@ -40,6 +41,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<string> FullAddress => GetFullAddress();
 		public Maybe<string> Answer { get; private set; }
 		public Maybe<string> PhoneNumber { get; private set; }
+		public Maybe<BrigadeId> BrigadeId { get; private set; }
 
 		private Maybe<string> GetFullAddress()
 		{
@@ -80,6 +82,7 @@ namespace Apollo.Domain.EDS.Applications
 			SourceId = e.SourceId;
 			PhoneNumber = e.PhoneNumber;
 			Answer = e.Answer;
+			BrigadeId = e.BrigadeId;
 		}
 
 		public void Apply(IReadModelContext context, IDomainEvent<Application, ApplicationId, ApplicationDescribed> domainEvent)

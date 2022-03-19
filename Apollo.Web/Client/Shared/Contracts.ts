@@ -397,6 +397,7 @@ export interface IReportsFromAdsAppSettings
 	applicationSourceViews: IApplicationSourceView[];
 	addressViews: IAddressView[];
 	organizationViews: IOrganizationView[];
+	brigadeViews: IBrigadeView[];
 }
 export interface IReportsDifferenceReportAppSettings
 {
@@ -731,6 +732,7 @@ export interface IListApplicationPagedUiQuery
 	dateTo: (dayjs.Dayjs | null);
 	search: (string | null);
 	sort: (ISortQuery | null);
+	filter: IFilterQuery[];
 }
 export interface IFilterApplicationPagedUiQuery
 {
@@ -1455,6 +1457,11 @@ export interface ISortQuery
 	field: string;
 	type: SortQueryType;
 }
+export interface IFilterQuery
+{
+	field: string;
+	value: any;
+}
 export interface ISearchResult<T>
 {
 	pageOfItems: T[];
@@ -1485,6 +1492,7 @@ export interface IApplicationView extends IMongoDbReadModel
 	fullAddress: (string | null);
 	answer: (string | null);
 	phoneNumber: (string | null);
+	brigadeId: (string | null);
 }
 export interface IApplicationsPlanReportBySource
 {
@@ -1554,17 +1562,19 @@ export class ApplicationCreated
 	public sourceId: (string | null);
 	public phoneNumber: (string | null);
 	public answer: (string | null);
+	public brigadeId: (string | null);
 	public context: IBusinessCallContext;
 	public static is(data: any) : data is ApplicationCreated
 	{
 		return data instanceof ApplicationCreated;
 	}
-	constructor (address: (string | null), answer: (string | null), apartmentNumber: (string | null), appealDateTime: dayjs.Dayjs, category: (string | null), cause: (string | null), context: IBusinessCallContext, correctionDate: (dayjs.Dayjs | null), datePlan: (dayjs.Dayjs | null), externalId: number, frame: (string | null), front: (number | null), house: (string | null), message: (string | null), number: string, organizationName: (string | null), phoneNumber: (string | null), sourceId: (string | null), vNum: string)
+	constructor (address: (string | null), answer: (string | null), apartmentNumber: (string | null), appealDateTime: dayjs.Dayjs, brigadeId: (string | null), category: (string | null), cause: (string | null), context: IBusinessCallContext, correctionDate: (dayjs.Dayjs | null), datePlan: (dayjs.Dayjs | null), externalId: number, frame: (string | null), front: (number | null), house: (string | null), message: (string | null), number: string, organizationName: (string | null), phoneNumber: (string | null), sourceId: (string | null), vNum: string)
 	{
 		this.address = address;
 		this.answer = answer;
 		this.apartmentNumber = apartmentNumber;
 		this.appealDateTime = appealDateTime;
+		this.brigadeId = brigadeId;
 		this.category = category;
 		this.cause = cause;
 		this.context = context;
@@ -1588,6 +1598,7 @@ export class ApplicationCreated
 			fromServer(data['answer']) as (string | null),
 			fromServer(data['apartmentNumber']) as (string | null),
 			fromServer(data['appealDateTime']) as dayjs.Dayjs,
+			fromServer(data['brigadeId']) as (string | null),
 			fromServer(data['category']) as (string | null),
 			fromServer(data['cause']) as (string | null),
 			fromServer(data['context']) as IBusinessCallContext,
@@ -1867,6 +1878,38 @@ export class OrganizationUpdated
 			fromServer(data['shortName']) as (string | null));
 	}
 }
+export interface IBrigadeView extends IMongoDbReadModel
+{
+	externalId: number;
+	name: string;
+	organizationId: (string | null);
+}
+export class BrigadeUpdated
+{
+	public name: string;
+	public organizationId: (string | null);
+	public externalId: number;
+	public context: IBusinessCallContext;
+	public static is(data: any) : data is BrigadeUpdated
+	{
+		return data instanceof BrigadeUpdated;
+	}
+	constructor (context: IBusinessCallContext, externalId: number, name: string, organizationId: (string | null))
+	{
+		this.context = context;
+		this.externalId = externalId;
+		this.name = name;
+		this.organizationId = organizationId;
+	}
+	public static create(data: any) 
+	{
+		return new BrigadeUpdated(
+			fromServer(data['context']) as IBusinessCallContext,
+			fromServer(data['externalId']) as number,
+			fromServer(data['name']) as string,
+			fromServer(data['organizationId']) as (string | null));
+	}
+}
 export interface IApplicationStateView extends IMongoDbReadModel
 {
 	name: string;
@@ -2007,6 +2050,7 @@ export class DomainEventMap
 		map.set('EmployeeUpdated', EmployeeUpdated);
 		map.set('DepartmentUpdated', DepartmentUpdated);
 		map.set('DepartmentPositionUpdated', DepartmentPositionUpdated);
+		map.set('BrigadeUpdated', BrigadeUpdated);
 		map.set('ApplicationTypeUpdated', ApplicationTypeUpdated);
 		map.set('ApplicationCreated', ApplicationCreated);
 		map.set('ApplicationDescribed', ApplicationDescribed);

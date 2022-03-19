@@ -1,14 +1,15 @@
 import {
 	IAddressView,
 	IApplicationSourceView,
-	IApplicationView, IOrganizationView,
-	IReportsFromAdsAppSettings, ISearchResult, ReportApiControllerProxy,
+	IApplicationView, IBrigadeView, IFilterQuery, IOrganizationView,
+	IReportsFromAdsAppSettings, ISearchResult, ISortQuery, ReportApiControllerProxy, SortQueryType,
 } from '@Shared/Contracts';
-import {makeObservable, observable} from "mobx";
+import {computed, makeObservable, observable} from "mobx";
 import {Pagination} from "../../Addresses/List/Store";
 import {HttpService} from "@Shared/HttpService";
 import {ApplicationFilterStore} from "./Filter";
 import {CommonStore} from "@Layout";
+import {FlexHeaderProps, FlexTableHeader, FlexTableHeaderStore} from "../../Applications/List/List";
 
 export class Store {
 	private service = new ReportApiControllerProxy(new HttpService());
@@ -20,6 +21,7 @@ export class Store {
 		this.applicationSourceViews = props.applicationSourceViews;
 		this.addressViews = props.addressViews;
 		this.organizationViews = props.organizationViews;
+		this.brigadeViews = props.brigadeViews;
 		this.filterStore = new ApplicationFilterStore();
 		this.pagination = ({
 			rowsPerPageOptions: [25, 50, 100, 500],
@@ -30,8 +32,148 @@ export class Store {
 			changedPage: this.changePage,
 			changedRowsPerPage: this.changeRowsPerPage
 		});
+
+		this.sorting = null;
+		const headers = [
+			FlexTableHeaderStore.createHeader('AppealDateTime', '#', false),
+			FlexTableHeaderStore.createHeader('Number', '№ вход.', false, null),
+			FlexTableHeaderStore.createHeader('VNum', '№(собств.)'),
+			FlexTableHeaderStore.createHeader('AppealDateTime', 'Дата обращ.', true, null),
+			FlexTableHeaderStore.createHeader('CorrectionDate', 'Дата исполнения', true, null),
+			FlexTableHeaderStore.createHeader('DatePlan', 'План. срок', true, null),
+			FlexTableHeaderStore.createHeader('DateClose', 'Дата закрытия', false, null),
+			FlexTableHeaderStore.createHeader('FullAddress', 'Адрес обращения', false, null),
+			FlexTableHeaderStore.createHeader('Category', 'Тип обращения'),
+			FlexTableHeaderStore.createHeader('Cause', 'Причина обращения'),
+			FlexTableHeaderStore.createHeader('Message', 'Сообщение'),
+			FlexTableHeaderStore.createHeader('ApplicationSourceViews', 'Откуда поступила', true, null),
+			FlexTableHeaderStore.createHeader('OrganizationName', 'Организация', false, null),
+			FlexTableHeaderStore.createHeader('BrigadeName', 'Бригада', false, ({
+				value: ''
+			})),
+			FlexTableHeaderStore.createHeader('Contractor', 'Отв. подрядчик'),
+			FlexTableHeaderStore.createHeader('Sanitation', 'Отв. санитария'),
+		];
+		this.header = [];
+
+		for (let value of headers) {
+			this.addHeader(value)
+		}
+		this.computeSorted();
 	}
 	
+	@observable
+	public editedFilterHeader: FlexTableHeader | null = null;
+	
+	public resetHeaderFilter = () => {
+		this.editedFilterHeader = null;
+
+		this.header
+			.filter(x => x.filter !== null && x.filter.value !== null && x.filter.value !== '')
+			.forEach(h => this.resetFilter(h.field));
+
+		this.refresh();
+	};
+
+	public applyHeaderFilter = () => {
+		this.editedFilterHeader = null;
+		
+		this.refresh();
+	};
+	
+	public editFilterHeader = (filter: FlexTableHeader) => {
+		this.editedFilterHeader = filter;
+	};
+
+	private addHeader = (h: FlexHeaderProps) => {
+		this.header.push(({
+			element: h.title,
+			field: h.field,
+			sort: null,
+			isShowSorted: false,
+			sortEnabled: h.sortEnabled,
+			filter: h.filter
+		}))
+	}
+
+	private computeSorted = () => {
+		if (this.header.length === 0) {
+			return;
+		}
+
+		this.setSortBy(0)
+		this.setSortBy(0)
+	};
+
+	@observable
+	public sorting: ISortQuery | null;
+
+	@computed
+	public get filters() {
+		return this.filterChips
+			.map(x => ({
+				field: x.field,
+				value: x.filter!.value
+			}) as IFilterQuery);
+	}
+
+	@computed
+	public get filterChips() {
+		return this.header
+			.filter(x => x.filter !== null && x.filter.value !== null && x.filter.value !== '');
+	}
+	
+	public resetFilter = (fieldName: string) => {
+		this.editedFilterHeader = null;
+		const index = this.header.findIndex(x => x.field === fieldName)
+		
+		if (index === -1) {
+			return;
+		}
+		
+		if (this.header[index].filter !== null) {
+			this.header[index].filter!.value = '';
+		}
+		
+		this.refresh();
+	};
+
+	public sort = (sorting: ISortQuery) => {
+		this.sorting = sorting;
+		this.refresh();
+	};
+
+	public setSortBy = (idx: number, invokeCallback?: boolean) => {
+		for (let i = 0; i < this.header.length; i++) {
+			if (i !== idx && this.header[i].sort !== null) {
+				this.header[i].sort = null;
+			}
+		}
+
+		if (this.header[idx].sort === null) {
+			this.header[idx].sort = SortQueryType.Asc;
+		}
+		else if (this.header[idx].sort === SortQueryType.Desc) {
+			this.header[idx].sort = SortQueryType.Asc;
+		}
+		else if (this.header[idx].sort === SortQueryType.Asc) {
+			this.header[idx].sort = SortQueryType.Desc;
+		}
+
+		if (invokeCallback === true) {
+			const sorting = ({
+				field: this.header[idx].field,
+				type: this.header[idx].sort || SortQueryType.Desc
+			})
+			this.sort(sorting);
+		}
+	};
+
+	@observable
+	public header: FlexTableHeader[];
+	
+	@observable
+	public brigadeViews: IBrigadeView[];
 	@observable
 	public organizationViews: IOrganizationView[];
 	@observable
@@ -44,6 +186,30 @@ export class Store {
 		if (!this.tt) {
 			window.addEventListener('mouseup', this.draggableTableStore.windowMouseUp);
 			this.tt = true;
+		}
+	};
+	
+	public pointerEnter = (idx: number) => {
+		for (let i = 0; i < this.header.length; i++) {
+			if (i !== idx && this.header[i].isShowSorted) {
+				this.header[i].isShowSorted = false;
+			}
+		}
+
+		if (!this.header[idx].isShowSorted) {
+			this.header[idx].isShowSorted = true;
+		}
+	};
+
+	public pointerLeave = (idx: number) => {
+		for (let i = 0; i < this.header.length; i++) {
+			if (i !== idx && this.header[i].isShowSorted) {
+				this.header[i].isShowSorted = false;
+			}
+		}
+
+		if (this.header[idx].isShowSorted) {
+			this.header[idx].isShowSorted = false;
 		}
 	};
 
@@ -108,7 +274,8 @@ export class Store {
 				search: this.filterStore.text.replace(' ', '').length === 0 ? null : this.filterStore.text,
 				dateFrom: this.filterStore.from,
 				dateTo: this.filterStore.to,
-				sort: null
+				sort: this.sorting,
+				filter: this.filters
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

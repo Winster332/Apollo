@@ -78,7 +78,8 @@ export class ApplicationsDialogStore {
 				dateFrom: this.filter.from,
 				dateTo: this.filter.to,
 				search: null,
-				sort: null
+				sort: null,
+				filter: []
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

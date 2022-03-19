@@ -17,6 +17,7 @@ using Functional.Maybe;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Apollo.Domain.EDS.ApplicationStates;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Organizations;
 using ApplicationId = Apollo.Domain.EDS.Applications.ApplicationId;
 
@@ -32,7 +33,15 @@ namespace Apollo.Web.Reports
 		
 		public Task<ActionResult<SearchResult<ApplicationView>>> List(ListApplicationPagedUiQuery query)
 			=> QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(query.Page, query.Size, query.Search, query.DateFrom, query.DateTo, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing))
+				.ProcessAsync(new ListApplicationsPagedQuery(
+					query.Page,
+					query.Size,
+					query.Search,
+					query.DateFrom,
+					query.DateTo,
+					Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing,
+					query.Sort,
+					query.Filter))
 				.AsActionResult();
 		
 		public Task<ActionResult<SearchResult<ApplicationView>>> FilterApplications(FilterApplicationPagedUiQuery query)
@@ -56,7 +65,9 @@ namespace Apollo.Web.Reports
 				query.Search,
 				query.DateFrom,
 				query.DateTo,
-				sourceFilter, Maybe<SortQuery>.Nothing), CancellationToken.None);
+				sourceFilter,
+				Maybe<SortQuery>.Nothing,
+				query.Filter), CancellationToken.None);
 
 			return searchResultApplicationViews;
 		}
@@ -146,7 +157,8 @@ namespace Apollo.Web.Reports
 					ApplicationSourceId.VkId.ToMaybe(),
 					Maybe<string>.Nothing, 
 					Maybe<string>.Nothing, 
-					ApplicationStateId.EmptyId
+					ApplicationStateId.EmptyId,
+					Maybe<BrigadeId>.Nothing
 				));
 			}
 			return ExecutionResult<int>.Success(1);

@@ -47,21 +47,27 @@ const StickTableFooter = styled(TableFooter)`
     box-shadow: 0px -3px 4px -4px #000;
 `;
 
-type FlexTableHeader = {
+export type FlexTableHeaderFilter = {
+	value: (any | null);
+}
+
+export type FlexTableHeader = {
 	element: React.ReactElement | string
 	sort: SortQueryType | null;
 	sortEnabled: boolean;
+	filter: FlexTableHeaderFilter | null;
 	isShowSorted: boolean;
 	field: string;
 };
 
-type FlexHeaderProps = {
+export type FlexHeaderProps = {
 	field: string;
 	title: string;
-	enabled: boolean
+	sortEnabled: boolean;
+	filter: FlexTableHeaderFilter | null;
 }
 
-class FlexTableHeaderStore {
+export class FlexTableHeaderStore {
 	private onSort: (sorting: ISortQuery) => void;
 	constructor(onSort: (sorting: ISortQuery) => void, values: FlexHeaderProps[]) {
 		makeObservable(this);
@@ -118,7 +124,8 @@ class FlexTableHeaderStore {
 			field: h.field,
 			sort: null,
 			isShowSorted: false,
-			sortEnabled: h.enabled
+			sortEnabled: h.sortEnabled,
+			filter: h.filter
 		}))
 	}
 	
@@ -146,11 +153,12 @@ class FlexTableHeaderStore {
 		}
 	};
 	
-	public static createHeader = (field: string, name: string, enabled: boolean = false) : FlexHeaderProps => {
+	public static createHeader = (field: string, name: string, sortEnabled: boolean = false, filter: (FlexTableHeaderFilter | null) = null) : FlexHeaderProps => {
 		return ({
 			title: name,
 			field: field,
-			enabled: enabled
+			sortEnabled: sortEnabled,
+			filter: filter
 		})
 	}
 }

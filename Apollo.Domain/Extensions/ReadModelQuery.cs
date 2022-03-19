@@ -86,4 +86,16 @@ namespace Apollo.Domain.Extensions
 			Type = type;
 		}
 	}
+
+	public class FilterQuery
+	{
+		public string Field { get; }
+		public object Value { get; }
+
+		public FilterQuery(string field, object value)
+		{
+			Field = field;
+			Value = value;
+		}
+	}
 }

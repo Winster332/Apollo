@@ -8,6 +8,7 @@ using Apollo.Domain.EDS.Applications;
 using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.ApplicationStates;
 using Apollo.Domain.EDS.ApplicationTypes;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.EDS.Peoples;
 using Apollo.Domain.Extensions;
@@ -41,8 +42,9 @@ namespace Apollo.Domain.Integrations.MsSql
 			new ApplicationTypeImporter(2, "Типы заявок", nameof(ApplicationTypeView)).SetEnable(true),
 			new ApplicationStateImporter(3, "Состояния заявок", nameof(ApplicationStateView)).SetEnable(true),
 			new OrganizationImporter(4, "Организации", nameof(OrganizationView)).SetEnable(true),
+			new BrigadeImporter(5, "Бригады", nameof(BrigadeView)).SetEnable(true),
 			// new PeoplesImporter(5, "Люди", nameof(PeopleView)).SetEnable(false),
-			new ApplicationImporter(6, "Заявки", nameof(ApplicationView)).SetEnable(true)
+			new ApplicationImporter(7, "Заявки", nameof(ApplicationView)).SetEnable(true)
 		};
 
 		public async Task<ExecutionResult<IntegrationView>> Start(CancellationToken ct)

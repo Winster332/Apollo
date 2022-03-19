@@ -79,7 +79,8 @@ export class Store {
 				search: null,
 				dateFrom: null,
 				dateTo: null,
-				sort: null
+				sort: null,
+				filter: []
 			}))
 			.then(r => {
 				this.searchResultReportViews = r;

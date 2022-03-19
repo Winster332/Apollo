@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.Extensions;
 using Apollo.Domain.SharedKernel;
@@ -158,6 +159,11 @@ namespace Apollo.Domain.EDS.Applications
 			var applicationViews = await LoadApplications(queryProcessor, from, to);
 			var addressViews = await queryProcessor.ProcessAsync(new ListAddressQuery(), CancellationToken.None);
 			var applicationSourceViews = await queryProcessor.ProcessAsync(new ListApplicationSourceQuery(), CancellationToken.None);
+			var brigadeGetter = MaybeFunctionalWrappers.Wrap<BrigadeId, string>(
+				(await queryProcessor.ProcessAsync(new ListBrigadeQuery(), CancellationToken.None))
+				.ToDictionary(x => BrigadeId.With(x.Id), c => c.Name)
+				.TryGetValue
+			);
 			
 			var package = new ExcelPackage();
 			var worksheet = package.Workbook.Worksheets.Add("Отчет");
@@ -183,6 +189,7 @@ namespace Apollo.Domain.EDS.Applications
 			{
 				"№ вход.", "№(собств.)", "Дата обращ.", "Дата исполнения", "План. срок", "Дата закрытия",
 				"Адрес обращения", "Тип обращения", "Причина обращения", "Сообщение", "Откуда поступила", "Организация",
+				"Бригадир",
 				"Подрядчик", "Сантиария"
 			};
 			table.AddRow(true, true, true, caption);
@@ -210,6 +217,8 @@ namespace Apollo.Domain.EDS.Applications
 						.Collapse()
 						.Select(c => c.Name)
 						.OrElse(string.Empty);
+
+					var brigadeName = row.BrigadeId.Select(brigadeGetter).Collapse().OrElse(string.Empty);
 					
 					table.AddRow(
 						true,
@@ -227,6 +236,7 @@ namespace Apollo.Domain.EDS.Applications
 						row.Message.OrElse(string.Empty),
 						sourceName,
 						row.OrganizationName,//.Select(organizationViews).Collapse(),
+						brigadeName,
 						contractor,
 						sanitation
 					);

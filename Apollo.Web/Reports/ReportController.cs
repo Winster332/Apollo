@@ -9,6 +9,7 @@ using Apollo.Domain.Configuration;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.Applications;
 using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.Extensions;
 using Apollo.Domain.Reports;
@@ -44,16 +45,18 @@ namespace Apollo.Web.Reports
 		[AccessEndpoint(RoleAccess.ReportFromAds)]
 		public Task<TypedResult<ReportsFromAdsAppSettings>> FromAds() => Authenticated(async () =>
 		{
-			var searchResultApplicationViews = await QueryProcessor.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing), CancellationToken.None);
+			var searchResultApplicationViews = await QueryProcessor.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing, Array.Empty<FilterQuery>()), CancellationToken.None);
 			var applicationSourceViews = await QueryProcessor.ProcessAsync(new ListApplicationSourceQuery());
 			var addressViews = await QueryProcessor.ProcessAsync(new ListAddressQuery());
 			var organizationViews = await QueryProcessor.ProcessAsync(new ListOrganizationsQuery());
+			var brigadeViews = await QueryProcessor.ProcessAsync(new ListBrigadeQuery());
 			
 			return await React(new ReportsFromAdsAppSettings(
 				searchResultApplicationViews,
 				applicationSourceViews,
 				addressViews,
-				organizationViews));
+				organizationViews,
+				brigadeViews));
 		});
 		
 		[AccessEndpoint(RoleAccess.ReportDifference)]
@@ -134,7 +137,8 @@ namespace Apollo.Web.Reports
 		SearchResult<ApplicationView> SearchResult,
 		IReadOnlyCollection<ApplicationSourceView> ApplicationSourceViews,
 		IReadOnlyCollection<AddressView> AddressViews,
-		IReadOnlyCollection<OrganizationView> OrganizationViews);
+		IReadOnlyCollection<OrganizationView> OrganizationViews,
+		IReadOnlyCollection<BrigadeView> BrigadeViews);
 	public record ReportsPlanAppSettings(
 		IReadOnlyCollection<ApplicationsPlanReportBySource> Reports,
 		IReadOnlyCollection<ApplicationSourceView> ApplicationSourceViews,

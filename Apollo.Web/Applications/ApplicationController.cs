@@ -38,7 +38,15 @@ namespace Apollo.Web.Applications
 		{
 			var ct = HttpContext.RequestAborted;
 			var searchResultApplicationViews = await QueryProcessor
-				.ProcessAsync(new ListApplicationsPagedQuery(0, 25, Maybe<string>.Nothing, Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing, Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing, Maybe<SortQuery>.Nothing), ct);
+				.ProcessAsync(new ListApplicationsPagedQuery(
+					0,
+					25,
+					Maybe<string>.Nothing,
+					Maybe<DateTime>.Nothing,
+					Maybe<DateTime>.Nothing,
+					Maybe<IReadOnlyCollection<ApplicationSourceId>>.Nothing,
+					Maybe<SortQuery>.Nothing,
+					Array.Empty<FilterQuery>()), ct);
 			// var addressViews = await QueryProcessor.ProcessAsync(new ListAddressQuery(), CancellationToken.None);
 			// var applicationCategoryViews = await QueryProcessor.ProcessAsync(new ListApplicationCategoryQuery(), CancellationToken.None);
 			var applicationStateViews = await QueryProcessor.ProcessAsync(new ListApplicationStateQuery(), ct);

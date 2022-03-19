@@ -223,7 +223,8 @@ export class Store {
 				search: this.filterStore.text.replace(' ', '').length === 0 ? null : this.filterStore.text,
 				dateFrom: null,
 				dateTo: null,
-				sort: this.sorting
+				sort: this.sorting,
+				filter: []
 			}))
 			.then(r => {
 				this.searchResultApplicationViews = r;

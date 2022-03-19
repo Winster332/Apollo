@@ -12,12 +12,14 @@ using MongoDB.Driver;
 using System.Linq;
 using System.Linq.Expressions;
 using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Employees;
 using Apollo.Domain.SharedKernel;
 using MongoDB.Bson;
 using Apollo.Domain.Extensions;
 using EventFlow.Core;
 using MoreLinq.Extensions;
+using System.Linq;
 
 namespace Apollo.Domain.EDS.Applications
 {
@@ -306,12 +308,14 @@ namespace Apollo.Domain.EDS.Applications
 		public int PageSize { get; }
 		public Maybe<IReadOnlyCollection<ApplicationSourceId>> SourceIds { get; }
 		public Maybe<SortQuery> Sorting { get; }
+		public IReadOnlyCollection<FilterQuery> Filters { get; }
 		public ListApplicationsPagedQuery(
 			int pageIndex, int pageSize,
 			Maybe<string> searchText,
 			Maybe<DateTime> appealDateTimeFrom, Maybe<DateTime> appealDateTimeTo,
 			Maybe<IReadOnlyCollection<ApplicationSourceId>> sourceIds,
-			Maybe<SortQuery> sorting): base(pageSize, pageIndex)
+			Maybe<SortQuery> sorting,
+			IReadOnlyCollection<FilterQuery> filters): base(pageSize, pageIndex)
 		{
 			SearchText = searchText;
 			AppealDateTimeFrom = appealDateTimeFrom;
@@ -320,6 +324,7 @@ namespace Apollo.Domain.EDS.Applications
 			PageSize = pageSize;
 			SourceIds = sourceIds;
 			Sorting = sorting;
+			Filters = filters;
 		}
 
 		public override Task<SearchResult<ApplicationView>> Run(
@@ -415,6 +420,24 @@ namespace Apollo.Domain.EDS.Applications
 			var pipeline = collection
 				.Aggregate()
 				.Sort(sorting);
+
+			const string brigFieldName = "BrigadeName";
+			if (query.Filters.Select(x => x.Field == brigFieldName).Any())
+			{
+				var filterValue = query.Filters.First(x => x.Field == brigFieldName).Value as string;
+				var collectionBrigades = _mongoDatabase.GetCollection<BrigadeView>(_readModelDescriptionProvider.GetReadModelDescription<BrigadeView>().RootCollectionName.Value);
+				var brigadeViews = await collectionBrigades
+					.Aggregate()
+					.Match(Builders<BrigadeView>.Filter.Regex(c => c.Name,
+						new BsonRegularExpression(filterValue, "is")))
+					.ToListAsync(ct);
+				var brigadeIds = Enumerable.Select(
+					brigadeViews,
+					b => Builders<ApplicationView>.Filter.Eq(nameof(ApplicationView.BrigadeId), b.Id)
+				).ToArray();
+
+				pipeline = pipeline.Match(Builders<ApplicationView>.Filter.Or(brigadeIds));
+			}
 
 			if (expressions.Count != 0)
 			{

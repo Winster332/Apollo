@@ -1,20 +1,21 @@
 import {
 	Box,
-	Button,
+	Button, Chip,
 	Grid,
+	IconButton, Popover,
 	Table,
 	TableBody,
 	TableCell,
 	TableHead,
 	TablePagination,
-	TableRow,
+	TableRow, TextField, Typography,
 } from '@material-ui/core';
 import * as React from 'react';
 import {useEffect} from 'react';
 import {Store} from './Store';
 import {createApp} from "@Shared/CreateApp";
 import {observer} from "mobx-react-lite";
-import {IReportsFromAdsAppSettings} from "@Shared/Contracts";
+import {IReportsFromAdsAppSettings, SortQueryType} from "@Shared/Contracts";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import {ApplicationFilter} from "./Filter";
 import styled from "styled-components";
@@ -22,17 +23,80 @@ import {DatePickerRange} from "@Shared/DatePicker";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import {makeObservable, observable} from "mobx";
+import {CommonStore} from "@Layout";
+import {AppTheme} from "../../../Layout/CommonStore";
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 	const store = React.useState(() => new Store(props))[0];
 	const pagination = store.pagination;
 
+	const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const open = Boolean(anchorEl);
+	
+	const borderColor = CommonStore.instance.theme.current === AppTheme.Light ? '#e0e0e0' : '#182939';
+	
 	return <Grid container>
+		<Popover
+			open={open}
+			anchorEl={anchorEl}
+			onClose={handleClose}
+			anchorOrigin={{
+				vertical: 'bottom',
+				horizontal: 'center',
+			}}
+			transformOrigin={{
+				vertical: 'top',
+				horizontal: 'center',
+			}}
+		>
+			{store.editedFilterHeader !== null &&
+			<Box p={1}>
+				<Grid container xs={12}>
+					<Grid item xs={12}>
+						<Typography>{store.editedFilterHeader.element}</Typography>
+					</Grid>
+					<Grid item xs={12}>
+						<TextField
+							fullWidth
+							autoFocus
+							value={store.editedFilterHeader.filter?.value || ''}
+							onChange={e => {
+								if (store.editedFilterHeader !== null && store.editedFilterHeader.filter !== null && store.editedFilterHeader.filter.value !== null) {
+									store.editedFilterHeader.filter.value = e.target.value as string;
+								}
+							}}
+						/>
+					</Grid>
+					<Grid item xs={12}>
+						<Box pt={1} style={{display: 'flex'}}>
+							<Button onClick={() => {
+								handleClose();
+								store.resetHeaderFilter();
+							}}>Сбросить</Button>
+							<Button onClick={() => {
+								handleClose();
+								store.applyHeaderFilter();
+							}} style={{marginLeft: 'auto'}}>Применить</Button>
+						</Box>
+					</Grid>
+				</Grid>
+			</Box>}
+		</Popover>
 		<Grid item xs={12} style={{
 			position: 'sticky',
 			top: '0px',
 			background: 'space',
-			borderBottom: '1px solid #e0e0e0'
+			borderBottom: `1px solid ${borderColor}`
 		}}>
 			<Grid item xs={12} style={{display: 'flex'}}>
 				<Box p={1}>
@@ -60,8 +124,19 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 					<ApplicationFilter store={store.filterStore} onSearch={() => store.refresh()}/>
 				</Box>
 			</Grid>
-			<Grid item xs={12}>
-				<Box>
+			<Grid item xs={12} style={{display: 'flex'}}>
+				<Box style={{display: 'flex'}} pl={1}>
+					{store.filterChips.map((f, idx) =>
+						<Chip
+							style={{margin: 'auto 0px auto 0px'}}
+							key={idx}
+							label={f.element}
+							onDelete={() => store.resetFilter(f.field)}
+							variant="outlined"
+						/>
+					)}
+				</Box>
+				<Box style={{marginLeft: 'auto'}}>
 					<TablePagination
 						rowsPerPageOptions={pagination.rowsPerPageOptions}
 						component="div"
@@ -111,26 +186,34 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 						({ label: 'Сообщение', sorted: true }),
 						({ label: 'Откуда поступила', sorted: true }),
 						({ label: 'Организация', sorted: true }),
+						({ label: 'Бригада', sorted: true }),
 						({ label: 'Подрядчик', sorted: true }),
 						({ label: 'Санитария', sorted: true }),
 					]}/>
 				</TableRow>
 				<TableRow>
-					<TableCellSized>#</TableCellSized>
-					<TableCellSized>№ вход.</TableCellSized>
-					<TableCellSized>№(собств.)</TableCellSized>
-					<TableCellSized>Дата обращ.</TableCellSized>
-					<TableCellSized>Дата исполнения</TableCellSized>
-					<TableCellSized>План. срок</TableCellSized>
-					<TableCellSized>Дата закрытия</TableCellSized>
-					<TableCellSized>Адрес обращения</TableCellSized>
-					<TableCellSized>Тип обращения</TableCellSized>
-					<TableCellSized>Причина обращения</TableCellSized>
-					<TableCellSized>Сообщение</TableCellSized>
-					<TableCellSized>Откуда поступила</TableCellSized>
-					<TableCellSized>Организация</TableCellSized>
-					<TableCellSized>Отв. подрядчик</TableCellSized>
-					<TableCellSized>Отв. санитария</TableCellSized>
+					{store.header.map((h, idxh) =>
+						<TableCellSized key={idxh} onMouseLeave={() => store.pointerLeave(idxh)} onMouseEnter={() => store.pointerEnter(idxh)} style={{borderLeft: idxh === 0 ? 'none' : `1px solid ${borderColor}`, borderColor: borderColor}}>
+							<Box style={{display: 'flex'}}>
+								<span>{h.element}</span>
+								<Box style={{margin: 'auto 0px auto auto', display: 'flex', height: '23px'}}>
+									{h.sortEnabled &&
+									<IconButton style={{width: '23px'}} size='small' onClick={() => store.setSortBy(idxh, true)}>
+										{h.sort === SortQueryType.Asc && <ArrowUpwardIcon fontSize='small'/>}
+										{h.sort === SortQueryType.Desc && <ArrowDownwardIcon fontSize='small'/>}
+										{(h.isShowSorted && h.sort === null) && <ArrowUpwardIcon style={{fill: '#cccccc69'}} fontSize='small'/>}
+									</IconButton>}
+									{h.filter !== null && 
+									<IconButton style={{width: '23px'}} size='small' onClick={e => {
+										handleClick(e);
+										store.editFilterHeader(h)
+									}}>
+										<FilterListIcon fontSize='small'/>
+									</IconButton>}
+								</Box>
+							</Box>
+						</TableCellSized>
+					)}
 				</TableRow>
 			</TableHead>
 			<TableBody>
@@ -155,9 +238,11 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 								sanitation: addressView.sanitation
 							})
 						}
+						const brigadeName = store.brigadeViews.find(x => x.id === row.brigadeId)?.name;
 						return ({
 							...row,
 							responsible: responsible,
+							brigadeName: brigadeName
 						})
 					})
 					.map((row, idx) => <TableRow key={idx}>
@@ -175,6 +260,7 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 					<TableCellSized>{store.applicationSourceViews.find(a => a.id === row.sourceId)?.name || ''}</TableCellSized>
 					{/*<TableCellSized>{row.organizationId === null ? '' : store.organizationViews.find(o => o.id === row.organizationId)?.longName}</TableCellSized>*/}
 						<TableCellSized>{row.organizationName}</TableCellSized>
+						<TableCellSized>{row.brigadeName}</TableCellSized>
 						<TableCellSized>{row.responsible?.contractor}</TableCellSized>
 						<TableCellSized>{row.responsible?.sanitation}</TableCellSized>
 				</TableRow>)}
@@ -276,6 +362,8 @@ const SortedTableHead = observer((props: SortedTableHeadProps) => {
 
 const TableCellSized = styled(TableCell)`
 	font-size: 11px;
+	min-width: 100px;
+	padding: 10px;
 `;
 
 type HoverableRowProps = {

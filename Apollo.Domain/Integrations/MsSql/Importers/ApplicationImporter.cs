@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Apollo.Domain.EDS.Applications;
 using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.ApplicationStates;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.Extensions;
 using Apollo.Domain.Integrations.MsSql.Models;
 using Apollo.Domain.SharedKernel;
@@ -51,6 +52,13 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 					.ToDictionary(s => s.ExternalId, l => ApplicationSourceId.With(l.Id)));
 		}
 		
+		private async Task<Dictionary<int, BrigadeId>> LoadBrigadesCache(CancellationToken ct)
+		{
+			var sourceViews = await QueryProcessor.ProcessAsync(new ListBrigadeQuery(), ct);
+			return sourceViews
+				.ToDictionary(x => x.ExternalId, x => BrigadeId.With(x.Id));
+		}
+		
 		public Maybe<T> GetValueFromCache<T>(Dictionary<int, Dictionary<int, T>> cache, int groupId, int id)
 		{
 			if (cache.ContainsKey(groupId))
@@ -68,7 +76,7 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 			.Select(k => k.VNum != b.VNum || k.Number != b.Number || k.Category != b.Category || k.DatePlan != b.DatePlan
 				|| k.CorrectionDate != b.CorrectionDate || k.AppealDateTime != b.AppealDateTime || k.Message != b.Message || k.OrganizationName != b.OrganizationName
 				|| k.Cause != b.Cause || k.Address != b.Address || k.House != b.House || k.ApartmentNumber != b.ApartmentNumber
-				|| k.Frame != b.Frame || k.PhoneNumber != b.PhoneNumber || k.Front != b.Front || k.SourceId != b.SourceId)
+				|| k.Frame != b.Frame || k.PhoneNumber != b.PhoneNumber || k.Front != b.Front || k.SourceId != b.SourceId || k.BrigadeId != b.BrigadeId)
 			.OrElse(true);
 
 		public override async Task<SyncReport> DoAsync(CancellationToken ct)
@@ -77,6 +85,7 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 			
 			var sourceCache = await LoadApplicationSourceCache(ct);
 			var stateCache = await LoadApplicationStateCache(ct);
+			var brigadesCache = await LoadBrigadesCache(ct);
 			var cache = await CreateCache(new ListApplicationsQuery(Maybe<DateTime>.Nothing, Maybe<DateTime>.Nothing), x => x.ExternalId);
 			var externalApplications = await DbContext.EmergencyApplications
 				.Where(c => !c.DateTime.HasValue || c.DateTime.Value.Year >= 2022)
@@ -86,6 +95,7 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 			report.WriteLine($"Из кеша извлечено {cache.Count} элементов");
 			report.WriteLine($"Для свзяки извлечено {sourceCache.Values.Count} источников заявок");
 			report.WriteLine($"Для свзяки извлечено {stateCache.Values.Count} состояний заявок");
+			report.WriteLine($"Для свзяки извлечено {brigadesCache.Values.Count} бригад");
 			// var organizationGetter = MaybeFunctionalWrappers
 			// 	.Wrap<int, OrganizationView>((await QueryProcessor.ProcessAsync(new ListOrganizationsQuery())).ToDictionary(c => c.ExternalId).TryGetValue);
 
@@ -93,6 +103,9 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 			{
 				var extId = extApp.Id!.Value;
 				var internalView = cache.Get(extId);
+				var brigade = extApp.Brig.ToMaybe().Where(extbrigId => brigadesCache.ContainsKey(extbrigId))
+						.Select(brigId => brigadesCache[brigId]);
+				
 				var cmd = new EnsuringApplicationCommand(
 					internalView.Select(v => ApplicationId.With(v.Id)),
 					extId,
@@ -113,7 +126,8 @@ namespace Apollo.Domain.Integrations.MsSql.Importers
 					GetSourceId(sourceCache, extApp),
 					extApp.PhoneNumber.ToMaybe().Where(x => x.NotEmpty()).Select(x => x.Trim()),
 					extApp.Made.ToMaybe().Where(x => x.NotEmpty()).Select(x => x.Trim()),
-					GetStateId(stateCache, extApp).OrElse(ApplicationStateId.EmptyId)
+					GetStateId(stateCache, extApp).OrElse(ApplicationStateId.EmptyId),
+					brigade
 				);
 				
 				if (!IsDiff(internalView, cmd)) continue;

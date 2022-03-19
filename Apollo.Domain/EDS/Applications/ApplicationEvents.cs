@@ -4,6 +4,7 @@ using Apollo.Domain.Accounts.User;
 using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationCategories;
 using Apollo.Domain.EDS.ApplicationSources;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.EDS.Employees;
 using Apollo.Domain.EDS.Organizations;
 using Apollo.Domain.SharedKernel;
@@ -32,6 +33,7 @@ namespace Apollo.Domain.EDS.Applications
 			Maybe<ApplicationSourceId> sourceId,
 			Maybe<string> phoneNumber,
 			Maybe<string> answer,
+			Maybe<BrigadeId> brigadeId,
 			BusinessCallContext context)
 			: base(context)
 		{
@@ -53,6 +55,7 @@ namespace Apollo.Domain.EDS.Applications
 			SourceId = sourceId;
 			PhoneNumber = phoneNumber;
 			Answer = answer;
+			BrigadeId = brigadeId;
 		}
 
 		public int ExternalId { get; }
@@ -73,6 +76,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<ApplicationSourceId> SourceId { get; }
 		public Maybe<string> PhoneNumber { get; }
 		public Maybe<string> Answer { get; }
+		public Maybe<BrigadeId> BrigadeId { get; }
 	}
 	
 	public class ApplicationDescribed: BusinessAggregateEvent<Application, ApplicationId>

@@ -5,6 +5,7 @@ using Apollo.Domain.EDS.Addresses;
 using Apollo.Domain.EDS.ApplicationCategories;
 using Apollo.Domain.EDS.ApplicationSources;
 using Apollo.Domain.EDS.ApplicationStates;
+using Apollo.Domain.EDS.Brigades;
 using Apollo.Domain.SharedKernel;
 using EventFlow.Commands;
 using Functional.Maybe;
@@ -34,7 +35,8 @@ namespace Apollo.Domain.EDS.Applications
 			Maybe<ApplicationSourceId> sourceId,
 			Maybe<string> phoneNumber,
 			Maybe<string> answer,
-			ApplicationStateId stateId)
+			ApplicationStateId stateId,
+			Maybe<BrigadeId> brigadeId)
 			: base(id.OrElse(ApplicationId.New))
 		{
 			ExternalId = externalId;
@@ -56,6 +58,7 @@ namespace Apollo.Domain.EDS.Applications
 			PhoneNumber = phoneNumber;
 			StateId = stateId;
 			Answer = answer;
+			BrigadeId = brigadeId;
 		}
 
 		public int ExternalId { get; }
@@ -77,6 +80,7 @@ namespace Apollo.Domain.EDS.Applications
 		public Maybe<string> PhoneNumber { get; }
 		public ApplicationStateId StateId { get; }
 		public Maybe<string> Answer { get; }
+		public Maybe<BrigadeId> BrigadeId { get; }
 	}
 	
 	public class CreateApplicationCommand: Command<Application, ApplicationId, ExecutionResult<ApplicationId>>
