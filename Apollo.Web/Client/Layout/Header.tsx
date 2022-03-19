@@ -2,11 +2,10 @@ import {
 	AppBar,
 	Box,
 	Breadcrumbs,
-	Button, Grid,
+	Button,
+	Grid,
 	Hidden,
 	IconButton,
-	// Menu,
-	// MenuItem, 
 	Popover,
 	Toolbar,
 	Typography
@@ -68,6 +67,10 @@ export const Header = observer((props: Props) => {
 	const breadcrumbsGroupColor = CommonStore.instance.theme.current === AppTheme.Light ? '#c7c7c7' : 'rgb(100 100 100)'
 	const breadcrumbsToColor = CommonStore.instance.theme.current === AppTheme.Light ? 'rgb(255 255 255)' : 'rgb(48 48 48)'
 	const iconStyle = ({ width: '18px', height: '18px' })
+	const btnStyle = ({
+		color: CommonStore.instance.theme.current === AppTheme.Dark ? 'rgb(102, 178, 255)' : '#fff',
+		borderColor: CommonStore.instance.theme.current === AppTheme.Dark ? 'rgb(19, 47, 76)' : '#fff'
+	})
 	
 	return <StyledAppBar id='app-header' position='static'>
 		<StyledToolBar>
@@ -87,6 +90,7 @@ export const Header = observer((props: Props) => {
 			</Breadcrumbs>
 			<Box>
 				<HeaderIconButton
+					style={btnStyle}
 					ref={CommonStore.instance.notificationsStore.anchorElement}
 					color='inherit'
 					variant='outlined'
@@ -96,6 +100,7 @@ export const Header = observer((props: Props) => {
 					{!CommonStore.instance.notificationsStore.haveNotReadNotifications && <NotificationsNoneIcon style={iconStyle}/>}
 				</HeaderIconButton>
 				<HeaderIconButton
+					style={btnStyle}
 					color='inherit'
 					onClick={() => CommonStore.instance.theme.setTheme(CommonStore.instance.theme.current === AppTheme.Dark
 						? AppTheme.Light

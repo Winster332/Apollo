@@ -47,7 +47,7 @@ export const ToolEditor = observer((props: ({
 
 	return <Dialog
 		fullWidth
-		maxWidth='sm'
+		maxWidth={store.node.editorSize}
 		open={store.isOpen && store.node.editor !== undefined}
 		onClose={store.handleClose}
 	>

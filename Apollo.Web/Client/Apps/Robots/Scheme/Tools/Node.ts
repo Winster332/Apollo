@@ -7,6 +7,7 @@ export abstract class Node {
 	protected id: string;
 	protected ws: Workspace;
 	public selected: boolean;
+	public editorSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
 
 	protected constructor(workspace: Workspace, x: number, y: number) {
 		this.ws = workspace;
@@ -15,6 +16,7 @@ export abstract class Node {
 		this.y = y;
 		this.selected = false;
 		this.opacity = 1;
+		this.editorSize = 'sm';
 	}
 	
 	public getId = () => {

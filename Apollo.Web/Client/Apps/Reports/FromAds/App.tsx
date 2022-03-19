@@ -1,14 +1,18 @@
 import {
 	Box,
-	Button, Chip,
+	Button,
+	Chip,
 	Grid,
-	IconButton, Popover,
+	IconButton,
+	Popover,
 	Table,
 	TableBody,
 	TableCell,
 	TableHead,
 	TablePagination,
-	TableRow, TextField, Typography,
+	TableRow,
+	TextField,
+	Typography,
 } from '@material-ui/core';
 import * as React from 'react';
 import {useEffect} from 'react';
@@ -93,9 +97,9 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 			</Box>}
 		</Popover>
 		<Grid item xs={12} style={{
+			background: CommonStore.instance.theme.current === AppTheme.Dark ? '#0a1929' : 'rgb(250 250 250)',
 			position: 'sticky',
 			top: '0px',
-			background: 'space',
 			borderBottom: `1px solid ${borderColor}`
 		}}>
 			<Grid item xs={12} style={{display: 'flex'}}>
@@ -104,7 +108,6 @@ const ReportFromAdsApp = observer((props: IReportsFromAdsAppSettings) => {
 						<GetAppIcon style={{marginRight: '10px'}}/>
 						Выгрузить
 					</Button>
-					
 					<DatePickerRange
 						valueFrom={store.filterStore.from}
 						valueTo={store.filterStore.to}
