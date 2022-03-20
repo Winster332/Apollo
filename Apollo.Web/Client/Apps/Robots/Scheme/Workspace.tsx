@@ -20,6 +20,7 @@ import {FilesNode} from "./Tools/Files/FilesNode";
 import {HttpRequestNode} from "./Tools/Http/HttpRequestNode";
 import {ButtonsNode} from "./Tools/Buttons/ButtonsNode";
 import {StartBotNode} from "./Tools/Start/StartBotNode";
+import {TimerNode} from "./Tools/Timer/TimerNode";
 
 export enum PipelineDebugState {
 	Running,
@@ -195,6 +196,14 @@ export class Workspace {
 
 	public addButtons = (x: number, y: number) => {
 		const node = new ButtonsNode(this, x, y);
+		this.nodes.push(node);
+		node.onOpen = this.onOpen;
+
+		return node;
+	};
+
+	public addTimer = (x: number, y: number) => {
+		const node = new TimerNode(this, x, y);
 		this.nodes.push(node);
 		node.onOpen = this.onOpen;
 

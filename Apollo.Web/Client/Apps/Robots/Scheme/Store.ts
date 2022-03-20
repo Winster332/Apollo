@@ -28,6 +28,7 @@ export class Store {
 		this.workspace.addButtons(890, 100)
 		this.workspace.addHttpRequest(920, 400)
 		// this.workspace.addLogic(150, 500)
+		// this.workspace.addTimer(150, 500)
 		this.workspace.addFunc(380, 550)
 		// this.a = this.workspace.addSwitch(200, 100, 'Новое название')
 		// 	.addOutput('Нужна консультация', 2)
