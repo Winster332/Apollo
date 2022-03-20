@@ -2,13 +2,13 @@ import {makeObservable, observable} from "mobx";
 import * as React from "react";
 import {Node} from "../Node"
 import styled from "styled-components";
-import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
+import {Box, Button, Checkbox, FormControlLabel, Grid, IconButton, Radio, Typography} from "@material-ui/core";
 import {Workspace} from "../../Workspace";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import DeleteIcon from "@material-ui/icons/Delete";
 import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
 import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
+import {EditorStore} from "./EditorStore";
+import CloseIcon from '@material-ui/icons/Close';
+import {observer} from "mobx-react-lite";
 
 export class QuizNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
@@ -16,6 +16,7 @@ export class QuizNode extends Node {
 
 		makeObservable(this);
 
+		this.editorSize = 'xs';
 		this.id = Node.generateGuid();
 		this.variants = [];
 		this.editor = this.renderEditor;
@@ -28,7 +29,11 @@ export class QuizNode extends Node {
 		this.addVariant('Три')
 		this.addVariant('Четыри')
 		this.addVariant('Пять')
+		
+		this.editorStore = new EditorStore();
 	}
+	
+	private editorStore: EditorStore;
 
 	private refInner: React.RefObject<HTMLDivElement>;
 	// private refOuter: React.RefObject<HTMLDivElement>;
@@ -175,44 +180,199 @@ export class QuizNode extends Node {
 	};
 
 	private renderEditor = () => {
-		return <Grid container xs={12} spacing={2}>
-			<Grid item xs={12}>
-				{/*<TextField*/}
-				{/*	label='Название'*/}
-				{/*	fullWidth*/}
-				{/*	value={this.name} onChange={e => {*/}
-				{/*	this.name = (e.target.value as string);*/}
-				{/*}} />*/}
-			</Grid>
-			<Grid item xs={12}>
-				<Box>
-					{/*<Button onClick={() => this.recordToggle()} style={{minWidth: '0px'}}>*/}
-					{/*	{!this.isRecord ? <FiberSmartRecordIcon/> : <FiberManualRecordIcon style={{fill: '#ff4242'}}/>}*/}
-					{/*</Button>*/}
+		const store = this.editorStore;
+		
+		return <Grid container xs={12} spacing={1}>
+			<Grid item xs={12} style={{
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<Typography style={{
+						fontWeight: 600,
+						color: '#ddd',
+						paddingLeft: '7px'
+					}}>Новый опрос</Typography>
+					<Subtitle>Вопрос</Subtitle>
+					<input
+						placeholder='Задайте вопрос'
+						onChange={(e) => store.question = e.target.value}
+						value={store.question}
+						style={{
+							outline: 'none',
+							width: '100%',
+							fontSize: '14px',
+							padding: '7px',
+							color: '#ddd',
+							background: 'transparent',
+							border: 'none'
+						}}
+					/>
 				</Box>
 			</Grid>
-			<Grid item xs={12} container>
-				<Grid item xs={10}>
-				</Grid>
-				<Grid item xs={2}>
-					<Box style={{display: 'flex'}}>
-						<ButtonGroup style={{marginLeft: '4px'}}>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowUpwardIcon fontSize='small'/>
-							</IconButton>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowDownwardIcon fontSize='small'/>
-							</IconButton>
-						</ButtonGroup>
-						<IconButton size='small' style={{marginLeft: 'auto'}}>
-							<DeleteIcon fontSize='small'/>
-						</IconButton>
+			<Grid item xs={12} style={{
+				background: '#213144'
+			}}>
+				<Box style={{padding: '2px'}}></Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				borderTop: '1px solid rgb(18 23 28 / 30%)',
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<Subtitle>Варианты ответа</Subtitle>
+					<Box>
+						{store.items.map((item, idx) =>
+							<QuizItemView 
+								quizMode={store.quizMode}
+								selectedQuizItem={store.selectedQuizVariantId === item.id}
+								key={idx}
+								name={item.name}
+								id={item.id}
+								onSelectQuizItem={store.selectQuizVariant}
+								onChangeValue={store.changeItem}
+								onDelete={store.deleteItem}
+							/>
+						)}
 					</Box>
-				</Grid>
+				</Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				background: '#213144'
+			}}>
+				<Box style={{
+					padding: '2px',
+					paddingLeft: '17px',
+					fontWeight: 100,
+					fontFamily: 'system-ui',
+					fontSize: '13px'
+				}}>
+					{store.items.length === store.maxCountItems 
+						? <span>Вы указали максимальное количество вариантов ответа.</span> 
+						: <span>Можно добавить еще {store.maxCountItems-store.items.length} вариантов ответа.</span>}
+				</Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				borderTop: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<Subtitle>Настройки</Subtitle>
+					<Box pl={1}>
+						<FormControlLabel
+							control={
+								<Checkbox
+									disabled={store.quizMode}
+									checked={store.multipleChoice}
+									onChange={() => store.toggleMultipleChoice()}
+									name="checkedB"
+									color="primary"
+								/>
+							}
+							label="Выбор нескольких вариантов"
+						/>
+						<FormControlLabel
+							control={
+								<Checkbox
+									checked={store.quizMode}
+									onChange={() => store.toggleQuizMode()}
+									name="checkedB"
+									color="primary"
+								/>
+							}
+							label="Режим викторины"
+						/>
+					</Box>
+				</Box>
+			</Grid>
+			{store.quizMode && <Grid item xs={12}>
+				<Box p={1}>
+					<Subtitle>Объяснение</Subtitle>
+					<input
+						placeholder='Добавить комментарий (необязательно)'
+						onChange={(e) => store.answer = e.target.value}
+						value={store.answer}
+						style={{
+							outline: 'none',
+							width: '100%',
+							fontSize: '14px',
+							padding: '7px',
+							color: '#ddd',
+							background: 'transparent',
+							border: 'none',
+							borderBottom: '1px solid #121b24'
+						}}/>
+					<div style={{
+						marginLeft: '7px',
+						marginTop: '7px',
+						color: '#4a5d74'
+					}}>Участники увидят этот текст, если выберут неправильный ответ (полезно для образовательных тестов).</div>
+				</Box>
+			</Grid>}
+			<Grid item xs={12} style={{
+				display: 'flex'
+			}}>
+				<Box p={1} style={{
+					marginLeft: 'auto',
+					display: 'flex'
+				}}>
+					<Button><Subtitle style={{fontSize: '13px', margin: '0px'}}>Отмена</Subtitle></Button>
+					<Button><Subtitle style={{fontSize: '13px', margin: '0px'}}>Создать</Subtitle></Button>
+				</Box>
 			</Grid>
 		</Grid>;
 	};
 }
+
+const QuizItemView = observer((props: ({
+	quizMode: boolean;
+	key: number;
+	selectedQuizItem: boolean;
+	name: string;
+	id: string;
+	onChangeValue: (id: string, value: string) => void;
+	onDelete?: (id: string) => void;
+	onSelectQuizItem: (id: string) => void;
+})) => {
+	return <Box key={props.key} style={{
+		position: 'relative',
+		borderBottom: '1px solid #121b24',
+		display: 'flex'
+	}}>
+		{props.quizMode &&
+		<Radio
+			checked={props.selectedQuizItem}
+			onChange={() => props.onSelectQuizItem(props.id)}
+			value="a"
+			style={{
+				opacity: 0.6
+			}}
+			name="radio-button-demo"
+			inputProps={{ 'aria-label': 'A' }}
+		/>
+		}
+		<input value={props.name} onChange={e => props.onChangeValue(props.id, e.target.value as string)} placeholder='Добавить ответ...' style={{
+			outline: 'none',
+			width: '100%',
+			fontSize: '14px',
+			padding: '7px',
+			color: '#ddd',
+			background: 'transparent',
+			border: 'none'
+		}}/>
+		{props.onDelete &&
+		<IconButton size='small' onClick={() => {
+			if (props.onDelete) {
+				props.onDelete(props.id);
+			}
+		}} style={{
+			position: 'absolute',
+			right: '0px',
+			top: '2px'
+		}}>
+			<CloseIcon fontSize='small' style={{fill: '#757575'}}/>
+		</IconButton>
+		}
+	</Box>
+});
 
 const Speech = styled(Box)`
 	position: absolute;
@@ -223,6 +383,14 @@ const Speech = styled(Box)`
     border-radius: 5px;
     background: #1c4570;
     user-select: none;
+`
+
+const Subtitle = styled(Typography)`
+	font-weight: 600;
+	color: #5ab3ff;
+	font-size: 14px;
+	margin-top: 7px;
+	padding-left: 6px;
 `
 
 const QuizItem = styled('div')`

@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import * as React from 'react';
 import {
-	Button, Dialog,
-	DialogActions, DialogContent,
+	Dialog,
+	DialogContent,
 	// FormControl,
 	// FormControlLabel,
 	// InputLabel,
@@ -51,7 +51,11 @@ export const ToolEditor = observer((props: ({
 		open={store.isOpen && store.node.editor !== undefined}
 		onClose={store.handleClose}
 	>
-		<DialogContent>
+		<DialogContent style={{
+			background: '#162230',
+			padding: '0px',
+			// overflow: 'hidden'
+		}}>
 			{store.node.editor && store.node.editor()}
 			{/*<form noValidate>*/}
 			{/*	<FormControl>*/}
@@ -80,10 +84,10 @@ export const ToolEditor = observer((props: ({
 			{/*	/>*/}
 			{/*</form>*/}
 		</DialogContent>
-		<DialogActions>
-			<Button onClick={store.handleClose} color="primary">
-				Закрыть
-			</Button>
-		</DialogActions>
+		{/*<DialogActions>*/}
+		{/*	<Button onClick={store.handleClose} color="primary">*/}
+		{/*		Закрыть*/}
+		{/*	</Button>*/}
+		{/*</DialogActions>*/}
 	</Dialog>
 });

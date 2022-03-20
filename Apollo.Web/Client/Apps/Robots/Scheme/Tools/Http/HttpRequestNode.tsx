@@ -125,14 +125,16 @@ export class HttpRequestNode extends Node {
 	};
 
 	private renderEditor = () => {
-		return <Grid container xs={12}>
-			<Grid item xs={12}>
-				<HttpSender store={this.editorStore.httpSenderStore}/>
+		return <Box p={1}>
+			<Grid container xs={12}>
+				<Grid item xs={12}>
+					<HttpSender store={this.editorStore.httpSenderStore}/>
+				</Grid>
+				<Grid item xs={12}>
+					<HttpResponse store={this.editorStore.httpResponseTab}/>
+				</Grid>
 			</Grid>
-			<Grid item xs={12}>
-				<HttpResponse store={this.editorStore.httpResponseTab}/>
-			</Grid>
-		</Grid>;
+		</Box>;
 	};
 }
 
