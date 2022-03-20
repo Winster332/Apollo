@@ -2,26 +2,36 @@ import {makeObservable, observable} from "mobx";
 import * as React from "react";
 import {Node} from "../Node"
 import styled from "styled-components";
-import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
+import {Avatar, Box, Button, Grid, IconButton} from "@material-ui/core";
 import {Workspace} from "../../Workspace";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import DeleteIcon from "@material-ui/icons/Delete";
 import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
+import {TgLabel, TgSubtitle, TgTitle} from "../Quiz/QuizNode";
+import {EditorStore} from "./EditorStore";
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import CachedIcon from '@material-ui/icons/Cached';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 export class FilesNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
 		super(ws, x, y);
 
 		makeObservable(this);
+		
+		this.editorSize = 'xs';
 
 		this.id = Node.generateGuid();
 		this.outputs = [];
 		this.editor = this.renderEditor;
+		this.refFileUpload = React.createRef<HTMLInputElement>();
 		this.refInner = React.createRef<HTMLDivElement>();
 		this.refOuter = React.createRef<HTMLDivElement>();
+		
+		this.editorStore = new EditorStore();
 	}
+
+	private refFileUpload: React.RefObject<HTMLInputElement>;
+	private editorStore: EditorStore;
 	
 	private refInner: React.RefObject<HTMLDivElement>;
 	private refOuter: React.RefObject<HTMLDivElement>;
@@ -181,41 +191,114 @@ export class FilesNode extends Node {
 	};
 
 	private renderEditor = () => {
-		return <Grid container xs={12} spacing={2}>
-			<Grid item xs={12}>
-				{/*<TextField*/}
-				{/*	label='Название'*/}
-				{/*	fullWidth*/}
-				{/*	value={this.name} onChange={e => {*/}
-				{/*	this.name = (e.target.value as string);*/}
-				{/*}} />*/}
-			</Grid>
-			<Grid item xs={12}>
-				<Box>
-					{/*<Button onClick={() => this.recordToggle()} style={{minWidth: '0px'}}>*/}
-					{/*	{!this.isRecord ? <FiberSmartRecordIcon/> : <FiberManualRecordIcon style={{fill: '#ff4242'}}/>}*/}
-					{/*</Button>*/}
+		const store = this.editorStore;
+		
+		return <Grid container xs={12} spacing={1}>
+			<Grid item xs={12} style={{
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<TgTitle>Отправка файлов</TgTitle>
+					<TgSubtitle>Подпись</TgSubtitle>
+					<input
+						placeholder='Подпись к файлам...'
+						onChange={(e) => store.message = e.target.value}
+						value={store.message}
+						style={{
+							outline: 'none',
+							width: '100%',
+							fontSize: '14px',
+							padding: '7px',
+							color: '#ddd',
+							background: 'transparent',
+							border: 'none'
+						}}
+					/>
 				</Box>
 			</Grid>
-			<Grid item xs={12} container>
-				<Grid item xs={10}>
-					{/*<VoiceControl src={'https://www.w3schools.com/jsref/horse.mp3'}/>*/}
-				</Grid>
-				<Grid item xs={2}>
-					<Box style={{display: 'flex'}}>
-						<ButtonGroup style={{marginLeft: '4px'}}>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowUpwardIcon fontSize='small'/>
-							</IconButton>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowDownwardIcon fontSize='small'/>
-							</IconButton>
-						</ButtonGroup>
-						<IconButton size='small' style={{marginLeft: 'auto'}}>
-							<DeleteIcon fontSize='small'/>
-						</IconButton>
-					</Box>
-				</Grid>
+			<Grid item xs={12} style={{
+				background: '#213144'
+			}}>
+				<Box style={{padding: '2px'}}></Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				borderTop: '1px solid rgb(18 23 28 / 30%)',
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1} pl={2}>
+					{store.files.length === 0 && <Box p={2}>
+						<TgLabel style={{
+							textAlign: 'center',
+							color: '#cccccc47'
+						}}>Список пуст</TgLabel>
+					</Box>}
+					{store.files.length !== 0 && <Box>
+						{store.files.map((file, idx) => <div key={idx} style={{display: 'flex', marginBottom: idx === store.files.length-1 ? '0px' : '14px'}}>
+							<div style={{
+								marginRight: '14px'
+							}}>
+								<Avatar style={{
+									background: '#4bb3ff'
+								}}>
+									<InsertDriveFileIcon fontSize='small' style={{fill: '#fff'}}/>
+								</Avatar>
+							</div>
+							<div>
+								<div style={{
+									color: '#ddd',
+									fontWeight: 600
+								}}>{file.name}</div>
+								<div style={{
+									color: '#ffffff59',
+									fontSize: '12px',
+									verticalAlign: 'bottom',
+									display: 'contents'
+								}}>{store.convertKbToString(file.size)}</div>
+							</div>
+							<div style={{
+								display: 'flex',
+								marginLeft: 'auto'
+							}}>
+								<div style={{
+									margin: 'auto'
+								}}>
+									<IconButton size='small' onClick={() => {
+										store.reloadFile(file.id);
+										this.refFileUpload.current?.click()
+									}}>
+										<CachedIcon fontSize='small' style={{fill: 'rgba(255, 255, 255, 0.35)'}}/>
+									</IconButton>
+									<IconButton size='small' onClick={() => store.removeFile(file.id)}>
+										<DeleteIcon fontSize='small' style={{fill: 'rgba(255, 255, 255, 0.35)'}}/>
+									</IconButton>
+								</div>
+							</div>
+						</div>)}
+					</Box>}
+				</Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				display: 'flex'
+			}}>
+				<Box style={{
+					display: 'flex'
+				}}>
+					<Button style={{
+						margin: 'auto',
+						marginLeft: '7px'
+					}}><TgSubtitle style={{fontSize: '13px', margin: '0px'}} onClick={() => this.refFileUpload.current?.click()}>Добавить</TgSubtitle></Button>
+					<input style={{display: 'none'}} type='file' ref={this.refFileUpload} onChange={e => {
+						store.uploadFile(e.target.files?.item(0) || null);
+						e.target.files = null;
+					}}/>
+				</Box>
+				<Box p={1} style={{
+					marginLeft: 'auto',
+					display: 'flex'
+				}}>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Отмена</TgSubtitle></Button>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Создать</TgSubtitle></Button>
+				</Box>
 			</Grid>
 		</Grid>;
 	};
