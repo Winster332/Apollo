@@ -1,10 +1,10 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, Grid, InputAdornment, TextField} from "@material-ui/core";
-import {Workspace} from "../Workspace";
-import {Robot1Icon} from "../../List/App";
+import {Workspace} from "../../Workspace";
+import {Robot1Icon} from "../../../List/App";
 
 export class StartBotNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {

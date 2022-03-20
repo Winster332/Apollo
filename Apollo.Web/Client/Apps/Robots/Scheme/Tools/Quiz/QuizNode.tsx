@@ -1,14 +1,14 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
-import {Workspace} from "../Workspace";
+import {Workspace} from "../../Workspace";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
 import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
+import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
 
 export class QuizNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
@@ -193,7 +193,6 @@ export class QuizNode extends Node {
 			</Grid>
 			<Grid item xs={12} container>
 				<Grid item xs={10}>
-					{/*<VoiceControl src={'https://www.w3schools.com/jsref/horse.mp3'}/>*/}
 				</Grid>
 				<Grid item xs={2}>
 					<Box style={{display: 'flex'}}>

@@ -8,7 +8,7 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
 import TransitEnterexitIcon from '@material-ui/icons/TransitEnterexit';
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
+import {ConnectorInner, ConnectorOuter} from "./Start/StartBotNode";
 
 export class UserActionNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {

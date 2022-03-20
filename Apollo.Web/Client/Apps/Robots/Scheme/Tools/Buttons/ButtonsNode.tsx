@@ -1,16 +1,16 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
-import {Workspace} from "../Workspace";
-import TextFieldsIcon from '@material-ui/icons/TextFields';
+import {Workspace} from "../../Workspace";
+import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
+import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
 
-export class TextNode extends Node {
+export class ButtonsNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
 		super(ws, x, y);
 
@@ -19,12 +19,12 @@ export class TextNode extends Node {
 		this.id = Node.generateGuid();
 		this.outputs = [];
 		this.editor = this.renderEditor;
+
 		this.refInner = React.createRef<HTMLDivElement>();
-		this.refOuter = React.createRef<HTMLDivElement>();
 	}
 
 	private refInner: React.RefObject<HTMLDivElement>;
-	private refOuter: React.RefObject<HTMLDivElement>;
+
 	public addOutput = (name: string, number: number) => {
 		const id = Node.generateGuid();
 		this.outputs.push(({
@@ -67,34 +67,6 @@ export class TextNode extends Node {
 		}) | null);
 	})[];
 
-	public getInputPosition = () => {
-		const e = document.getElementById(`${this.id}-input`);
-
-		if (e === null) {
-			return null;
-		}
-
-		const pos = this.getOffset(e);
-
-		return ({
-			x: pos.x+5,
-			y: pos.y+8
-		})
-	};
-
-	private open = () => {
-		if (this.onOpen) {
-			this.onOpen(this);
-		}
-	};
-
-	private touchDown = () => {
-		this.selected = true;
-	};
-
-	private touchUp = () => {
-	};
-	
 	private getInnerPosition = () => {
 		if (this.refInner.current === null) {
 			return ({
@@ -110,19 +82,17 @@ export class TextNode extends Node {
 		})
 	};
 
-	public getOuterPosition = () => {
-		if (this.refOuter.current === null) {
-			return ({
-				x: 0,
-				y: 0
-			})
+	private open = () => {
+		if (this.onOpen) {
+			this.onOpen(this);
 		}
-		const pos = this.getOffset(this.refOuter.current);
+	};
 
-		return ({
-			x: pos.x+5,
-			y: pos.y+8
-		})
+	private touchDown = () => {
+		this.selected = true;
+	};
+
+	private touchUp = () => {
 	};
 
 	public render = () => {
@@ -141,33 +111,28 @@ export class TextNode extends Node {
 				position: 'relative'
 			}}>
 				<div style={{display: 'flex'}}>
-					<TextFieldsIcon style={{
+					<PanoramaWideAngleIcon style={{
 						fill: 'rgb(118 136 155)',
 						width: '20px',
 						marginTop: '3px',
 						marginRight: '6px'
 					}}/>
-					<span style={{marginTop: '4px'}}>Текст</span>
+					<span style={{marginTop: '4px'}}>Кнопки</span>
 				</div>
+
 				<ConnectorInner
 					ref={this.refInner}
 					onMouseUp={() => {
 						if (this.refInner.current === null) {
 							return;
 						}
-						
+
 						this.ws.endJoint(this, this.getInnerPosition)
 					}}
 					onMouseDown={(e) => {
-					e.stopPropagation();
-				}}/>
-				<ConnectorOuter
-					ref={this.refOuter}
-					onMouseDown={(e) => {
-					e.stopPropagation();
-
-					this.ws.beginJoint(this, this.getOuterPosition)
-				}}/>
+						e.stopPropagation();
+					}}/>
+				<ConnectorOuter/>
 			</div>
 			<div style={{
 				background: '#102944',
@@ -179,7 +144,17 @@ export class TextNode extends Node {
 			}}>
 				<div style={{
 					padding: '3px 7px'
-				}}>Какой-то <TextMonospace>monospace</TextMonospace> текст <TextBold>который</TextBold> мы пишем <TextLink>пользователю</TextLink>, чтоб <TextCrossedOut>он</TextCrossedOut> <TextItalic>прочитал</TextItalic> и запомнил</div>
+				}}>
+					<Button>Какой-то текст 1</Button>
+					<Grid container xs={12}>
+						<Grid item xs={6} style={{paddingRight: '3.5px'}}>
+							<Button>Какой-то текст 2</Button>
+						</Grid>
+						<Grid item xs={6} style={{paddingLeft: '3.5px'}}>
+							<Button>Какой-то текст 3</Button>
+						</Grid>
+					</Grid>
+				</div>
 			</div>
 		</Speech>
 	};
@@ -225,37 +200,6 @@ export class TextNode extends Node {
 	};
 }
 
-const TextMonospace = styled('span')`
-	color: #547699;
-    font-weight: 100;
-    font-family: monospace;
-`
-
-const TextBold = styled('span')`
-	font-weight: 700;
-    color: #ccc;
-`
-
-const TextItalic = styled('span')`
-    font-style: italic;
-`
-
-const TextLink = styled('a')`
-    text-decoration: normal;
-    color: #66b2ff;
-	transition: 0.2s;
-	cursor: pointer;
-
-	&:hover {
-		text-decoration: underline;
-		opacity: 0.8;
-	}
-`
-
-const TextCrossedOut = styled('span')`
-    text-decoration: line-through;
-`
-
 const Speech = styled(Box)`
 	position: absolute;
 	width: 200px;
@@ -267,22 +211,14 @@ const Speech = styled(Box)`
     user-select: none;
 `
 
-export const ControllerItem = styled('div')`
-	display: flex;
-	margin: 2px 0px;
-	padding-left: 5px;
+const Button = styled('div')`
+	margin: 3px 0px;
+    padding: 5px 0px;
+    background: #ffffff1f;
+    border-radius: 5px;
+    text-align: center;
 	
 	&:hover {
-		background: #15365a;
+		background: #ffffff38;
 	}
-`
-
-export const ConnectorIn = styled('div')`
-	float: right;
-    background: #0a1828;
-    border-bottom-left-radius: 50%;
-    border-top-left-radius: 50%;
-    width: 15px;
-    text-align: center;
-    color: #929292;
 `

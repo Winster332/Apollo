@@ -1,16 +1,16 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
-import {Workspace} from "../Workspace";
-import AttachFileIcon from '@material-ui/icons/AttachFile';
+import {Workspace} from "../../Workspace";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
+import FunctionsIcon from '@material-ui/icons/Functions';
+import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
 
-export class FilesNode extends Node {
+export class FunctionNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
 		super(ws, x, y);
 
@@ -22,7 +22,7 @@ export class FilesNode extends Node {
 		this.refInner = React.createRef<HTMLDivElement>();
 		this.refOuter = React.createRef<HTMLDivElement>();
 	}
-	
+
 	private refInner: React.RefObject<HTMLDivElement>;
 	private refOuter: React.RefObject<HTMLDivElement>;
 
@@ -137,13 +137,13 @@ export class FilesNode extends Node {
 				position: 'relative'
 			}}>
 				<div style={{display: 'flex'}}>
-					<AttachFileIcon style={{
+					<FunctionsIcon style={{
 						fill: 'rgb(118 136 155)',
 						width: '20px',
 						marginTop: '3px',
 						marginRight: '6px'
 					}}/>
-					<span style={{marginTop: '4px'}}>Файлы</span>
+					<span style={{marginTop: '4px'}}>Функция</span>
 				</div>
 
 				<ConnectorInner ref={this.refInner} onMouseUp={() => {
@@ -154,9 +154,9 @@ export class FilesNode extends Node {
 					this.ws.endJoint(this, this.getInnerPosition)
 				}}
 								onMouseDown={(e) => {
-									   e.stopPropagation();
-								   }}/>
-				<ConnectorOuter 
+									e.stopPropagation();
+								}}/>
+				<ConnectorOuter
 					ref={this.refOuter}
 					onMouseDown={(e) => {
 						e.stopPropagation();
@@ -170,10 +170,14 @@ export class FilesNode extends Node {
 				borderBottomLeftRadius: '5px',
 				borderBottomRightRadius: '5px',
 				fontSize: '13px',
-				paddingTop: '2px',
-				paddingBottom: '2px'
+				// paddingTop: '2px',
+				// paddingBottom: '2px'
 			}}>
 				<div style={{
+					// padding: '3px 7px'
+					margin: '0px 15px',
+					borderLeft: '2px solid #1c4570',
+					borderRight: '2px solid #1c4570',
 					padding: '3px 7px'
 				}}>file.txt</div>
 			</div>

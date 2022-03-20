@@ -1,16 +1,16 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
-import {Workspace} from "../Workspace";
-import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
+import {Workspace} from "../../Workspace";
+import AttachFileIcon from '@material-ui/icons/AttachFile';
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
+import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
 
-export class ButtonsNode extends Node {
+export class FilesNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
 		super(ws, x, y);
 
@@ -19,11 +19,12 @@ export class ButtonsNode extends Node {
 		this.id = Node.generateGuid();
 		this.outputs = [];
 		this.editor = this.renderEditor;
-
 		this.refInner = React.createRef<HTMLDivElement>();
+		this.refOuter = React.createRef<HTMLDivElement>();
 	}
-
+	
 	private refInner: React.RefObject<HTMLDivElement>;
+	private refOuter: React.RefObject<HTMLDivElement>;
 
 	public addOutput = (name: string, number: number) => {
 		const id = Node.generateGuid();
@@ -82,6 +83,21 @@ export class ButtonsNode extends Node {
 		})
 	};
 
+	public getOuterPosition = () => {
+		if (this.refOuter.current === null) {
+			return ({
+				x: 0,
+				y: 0
+			})
+		}
+		const pos = this.getOffset(this.refOuter.current);
+
+		return ({
+			x: pos.x+5,
+			y: pos.y+8
+		})
+	};
+
 	private open = () => {
 		if (this.onOpen) {
 			this.onOpen(this);
@@ -106,33 +122,48 @@ export class ButtonsNode extends Node {
 			onMouseDown={() => this.touchDown()}
 			onMouseUp={() => this.touchUp()}
 		>
+			{/*<div id={`${this.id}-input`} style={{*/}
+			{/*	position: 'absolute',*/}
+			{/*	width: '15px',*/}
+			{/*	height: '15px',*/}
+			{/*	background: '#102944',*/}
+			{/*	left: '-15px',*/}
+			{/*	top: '50%',*/}
+			{/*	borderTopLeftRadius: '50%',*/}
+			{/*	borderBottomLeftRadius: '50%'*/}
+			{/*}}></div>*/}
 			<div style={{
 				padding: '2px 5px',
 				position: 'relative'
 			}}>
 				<div style={{display: 'flex'}}>
-					<PanoramaWideAngleIcon style={{
+					<AttachFileIcon style={{
 						fill: 'rgb(118 136 155)',
 						width: '20px',
 						marginTop: '3px',
 						marginRight: '6px'
 					}}/>
-					<span style={{marginTop: '4px'}}>Кнопки</span>
+					<span style={{marginTop: '4px'}}>Файлы</span>
 				</div>
 
-				<ConnectorInner
-					ref={this.refInner}
-					onMouseUp={() => {
-						if (this.refInner.current === null) {
-							return;
-						}
+				<ConnectorInner ref={this.refInner} onMouseUp={() => {
+					if (this.refInner.current === null) {
+						return;
+					}
 
-						this.ws.endJoint(this, this.getInnerPosition)
-					}}
+					this.ws.endJoint(this, this.getInnerPosition)
+				}}
+								onMouseDown={(e) => {
+									   e.stopPropagation();
+								   }}/>
+				<ConnectorOuter 
+					ref={this.refOuter}
 					onMouseDown={(e) => {
 						e.stopPropagation();
-					}}/>
-				<ConnectorOuter/>
+
+						this.ws.beginJoint(this, this.getOuterPosition)
+					}}
+				/>
 			</div>
 			<div style={{
 				background: '#102944',
@@ -144,17 +175,7 @@ export class ButtonsNode extends Node {
 			}}>
 				<div style={{
 					padding: '3px 7px'
-				}}>
-					<Button>Какой-то текст 1</Button>
-					<Grid container xs={12}>
-						<Grid item xs={6} style={{paddingRight: '3.5px'}}>
-							<Button>Какой-то текст 2</Button>
-						</Grid>
-						<Grid item xs={6} style={{paddingLeft: '3.5px'}}>
-							<Button>Какой-то текст 3</Button>
-						</Grid>
-					</Grid>
-				</div>
+				}}>file.txt</div>
 			</div>
 		</Speech>
 	};
@@ -210,15 +231,28 @@ const Speech = styled(Box)`
     background: #1c4570;
     user-select: none;
 `
+// transition: 0.3s;
+//
+// &:hover {
+// 	transform: scale(1.02);
+// }
 
-const Button = styled('div')`
-	margin: 3px 0px;
-    padding: 5px 0px;
-    background: #ffffff1f;
-    border-radius: 5px;
-    text-align: center;
+export const ControllerItem = styled('div')`
+	display: flex;
+	margin: 2px 0px;
+	padding-left: 5px;
 	
 	&:hover {
-		background: #ffffff38;
+		background: #15365a;
 	}
+`
+
+export const ConnectorIn = styled('div')`
+	float: right;
+    background: #0a1828;
+    border-bottom-left-radius: 50%;
+    border-top-left-radius: 50%;
+    width: 15px;
+    text-align: center;
+    color: #929292;
 `

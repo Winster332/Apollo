@@ -1,16 +1,16 @@
 import {makeObservable, observable} from "mobx";
 import * as React from "react";
-import {Node} from "./Node"
+import {Node} from "../Node"
 import styled from "styled-components";
 import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
-import {Workspace} from "../Workspace";
+import {Workspace} from "../../Workspace";
+import TextFieldsIcon from '@material-ui/icons/TextFields';
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
-import FunctionsIcon from '@material-ui/icons/Functions';
+import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
 
-export class FunctionNode extends Node {
+export class TextNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
 		super(ws, x, y);
 
@@ -25,7 +25,6 @@ export class FunctionNode extends Node {
 
 	private refInner: React.RefObject<HTMLDivElement>;
 	private refOuter: React.RefObject<HTMLDivElement>;
-
 	public addOutput = (name: string, number: number) => {
 		const id = Node.generateGuid();
 		this.outputs.push(({
@@ -68,6 +67,34 @@ export class FunctionNode extends Node {
 		}) | null);
 	})[];
 
+	public getInputPosition = () => {
+		const e = document.getElementById(`${this.id}-input`);
+
+		if (e === null) {
+			return null;
+		}
+
+		const pos = this.getOffset(e);
+
+		return ({
+			x: pos.x+5,
+			y: pos.y+8
+		})
+	};
+
+	private open = () => {
+		if (this.onOpen) {
+			this.onOpen(this);
+		}
+	};
+
+	private touchDown = () => {
+		this.selected = true;
+	};
+
+	private touchUp = () => {
+	};
+	
 	private getInnerPosition = () => {
 		if (this.refInner.current === null) {
 			return ({
@@ -98,19 +125,6 @@ export class FunctionNode extends Node {
 		})
 	};
 
-	private open = () => {
-		if (this.onOpen) {
-			this.onOpen(this);
-		}
-	};
-
-	private touchDown = () => {
-		this.selected = true;
-	};
-
-	private touchUp = () => {
-	};
-
 	public render = () => {
 		return <Speech
 			style={{
@@ -122,64 +136,50 @@ export class FunctionNode extends Node {
 			onMouseDown={() => this.touchDown()}
 			onMouseUp={() => this.touchUp()}
 		>
-			{/*<div id={`${this.id}-input`} style={{*/}
-			{/*	position: 'absolute',*/}
-			{/*	width: '15px',*/}
-			{/*	height: '15px',*/}
-			{/*	background: '#102944',*/}
-			{/*	left: '-15px',*/}
-			{/*	top: '50%',*/}
-			{/*	borderTopLeftRadius: '50%',*/}
-			{/*	borderBottomLeftRadius: '50%'*/}
-			{/*}}></div>*/}
 			<div style={{
 				padding: '2px 5px',
 				position: 'relative'
 			}}>
 				<div style={{display: 'flex'}}>
-					<FunctionsIcon style={{
+					<TextFieldsIcon style={{
 						fill: 'rgb(118 136 155)',
 						width: '20px',
 						marginTop: '3px',
 						marginRight: '6px'
 					}}/>
-					<span style={{marginTop: '4px'}}>Функция</span>
+					<span style={{marginTop: '4px'}}>Текст</span>
 				</div>
-
-				<ConnectorInner ref={this.refInner} onMouseUp={() => {
-					if (this.refInner.current === null) {
-						return;
-					}
-
-					this.ws.endJoint(this, this.getInnerPosition)
-				}}
-								onMouseDown={(e) => {
-									e.stopPropagation();
-								}}/>
+				<ConnectorInner
+					ref={this.refInner}
+					onMouseUp={() => {
+						if (this.refInner.current === null) {
+							return;
+						}
+						
+						this.ws.endJoint(this, this.getInnerPosition)
+					}}
+					onMouseDown={(e) => {
+					e.stopPropagation();
+				}}/>
 				<ConnectorOuter
 					ref={this.refOuter}
 					onMouseDown={(e) => {
-						e.stopPropagation();
+					e.stopPropagation();
 
-						this.ws.beginJoint(this, this.getOuterPosition)
-					}}
-				/>
+					this.ws.beginJoint(this, this.getOuterPosition)
+				}}/>
 			</div>
 			<div style={{
 				background: '#102944',
 				borderBottomLeftRadius: '5px',
 				borderBottomRightRadius: '5px',
 				fontSize: '13px',
-				// paddingTop: '2px',
-				// paddingBottom: '2px'
+				paddingTop: '2px',
+				paddingBottom: '2px'
 			}}>
 				<div style={{
-					// padding: '3px 7px'
-					margin: '0px 15px',
-					borderLeft: '2px solid #1c4570',
-					borderRight: '2px solid #1c4570',
 					padding: '3px 7px'
-				}}>file.txt</div>
+				}}>Какой-то <TextMonospace>monospace</TextMonospace> текст <TextBold>который</TextBold> мы пишем <TextLink>пользователю</TextLink>, чтоб <TextCrossedOut>он</TextCrossedOut> <TextItalic>прочитал</TextItalic> и запомнил</div>
 			</div>
 		</Speech>
 	};
@@ -225,6 +225,37 @@ export class FunctionNode extends Node {
 	};
 }
 
+const TextMonospace = styled('span')`
+	color: #547699;
+    font-weight: 100;
+    font-family: monospace;
+`
+
+const TextBold = styled('span')`
+	font-weight: 700;
+    color: #ccc;
+`
+
+const TextItalic = styled('span')`
+    font-style: italic;
+`
+
+const TextLink = styled('a')`
+    text-decoration: normal;
+    color: #66b2ff;
+	transition: 0.2s;
+	cursor: pointer;
+
+	&:hover {
+		text-decoration: underline;
+		opacity: 0.8;
+	}
+`
+
+const TextCrossedOut = styled('span')`
+    text-decoration: line-through;
+`
+
 const Speech = styled(Box)`
 	position: absolute;
 	width: 200px;
@@ -235,11 +266,6 @@ const Speech = styled(Box)`
     background: #1c4570;
     user-select: none;
 `
-// transition: 0.3s;
-//
-// &:hover {
-// 	transform: scale(1.02);
-// }
 
 export const ControllerItem = styled('div')`
 	display: flex;

@@ -7,8 +7,8 @@ import {Workspace} from "../Workspace";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {ConnectorInner, ConnectorOuter} from "./StartBotNode";
 import ImageAspectRatioIcon from '@material-ui/icons/ImageAspectRatio';
+import {ConnectorInner, ConnectorOuter} from "./Start/StartBotNode";
 
 export class LogicNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {

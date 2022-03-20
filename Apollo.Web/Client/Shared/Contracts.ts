@@ -193,6 +193,12 @@ export interface IUsersRolesRoleAppSettings
 /** Result of ApiControllerProxyGenerator activity */
 export class RobotApiControllerProxy
 {
+	public executeHttpRequest(req: ITestHttpRequest) : Promise<string>
+	{
+		const params = { 'req': fromClient(req) };
+		return this.http.post('/api/RobotApi/ExecuteHttpRequest', params)
+			.then((response: { data: any }) => { return fromServer(response.data) as string; });
+	}
 	public http: HttpService;
 	constructor (http: HttpService)
 	{
@@ -221,6 +227,37 @@ export class RobotController
 		);
 	}
 }
+export interface ITestHttpRequest
+{
+	method: HttpRequestMethod;
+	body: IHttpRequestBody;
+	url: string;
+}
+export interface IHttpRequestBody
+{
+	type: HttpRequestBodyType;
+	headers: IHttpCollectionKeyValue;
+	raw: (string | null);
+	formData: (IHttpCollectionKeyValue | null);
+	xWwwFormUrlencoded: (IHttpCollectionKeyValue | null);
+	binary: (IHttpRequestFile | null);
+}
+export interface IHttpCollectionKeyValue
+{
+	rows: IHttpKeyValue[];
+}
+export interface IHttpKeyValue
+{
+	key: string;
+	value: string;
+}
+export interface IHttpRequestFile
+{
+	name: string;
+	type: string;
+	size: number;
+	data: number[];
+}
 export interface IRobotsListAppSettings
 {
 	equalityContract: any;
@@ -228,6 +265,22 @@ export interface IRobotsListAppSettings
 export interface IRobotsSchemeAppSettings
 {
 	equalityContract: any;
+}
+export enum HttpRequestMethod { 
+	Get = 0, 
+	Post = 1, 
+	Put = 2, 
+	Patch = 3, 
+	Delete = 4, 
+	Head = 5, 
+	Options = 6
+}
+export enum HttpRequestBodyType { 
+	None = 0, 
+	FormData = 1, 
+	XWwwFormUrlencoded = 2, 
+	Raw = 3, 
+	Binary = 4
 }
 /** Result of ApiControllerProxyGenerator activity */
 export class ReportApiControllerProxy

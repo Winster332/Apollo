@@ -11,15 +11,15 @@ import {SwitchNode} from "./Tools/SwitchNode";
 import {SpeechNode} from "./Tools/SpeechNode";
 import {CommandNode} from "./Tools/CommandNode";
 import {ExtractDataNode} from "./Tools/ExtractDataNode";
-import {StartBotNode} from "./Tools/StartBotNode";
-import {TextNode} from "./Tools/TextNode";
-import {QuizNode} from "./Tools/QuizNode";
-import {FilesNode} from "./Tools/FilesNode";
 import {UserActionNode} from "./Tools/UserActionNode";
-import {ButtonsNode} from "./Tools/ButtonsNode";
-import {HttpRequestNode} from "./Tools/HttpRequestNode";
 import {LogicNode} from "./Tools/LogicNode";
-import {FunctionNode} from "./Tools/FunctionNode";
+import {TextNode} from "./Tools/Message/TextNode";
+import {QuizNode} from "./Tools/Quiz/QuizNode";
+import {FunctionNode} from "./Tools/Function/FunctionNode";
+import {FilesNode} from "./Tools/Files/FilesNode";
+import {HttpRequestNode} from "./Tools/Http/HttpRequestNode";
+import {ButtonsNode} from "./Tools/Buttons/ButtonsNode";
+import {StartBotNode} from "./Tools/Start/StartBotNode";
 
 export enum PipelineDebugState {
 	Running,
@@ -422,26 +422,12 @@ export class Workspace {
 			</svg>
 			{/*<CircleBox/>*/}
 			{/*<EndBox/>*/}
-			<Condition>
-				<div>Condition</div>
-			</Condition>
+
 			{this.nodes.map(n => n.render())}
 		</AbsoluteBox>
 	};
 }
 
-const Condition = styled(Box)`
-	position: absolute;
-	width: 100px;
-	height: 100px;
-	left: 500px;
-	top: 70px;
-	box-shadow: 0px 0px 4px -1px #000;
-    border-radius: 5px;
-    background: #1c4570;
-    user-select: none;
-    transform: rotate(45deg);
-`
 
 const AbsoluteBox = styled(Box)`
 	position: absolute;
