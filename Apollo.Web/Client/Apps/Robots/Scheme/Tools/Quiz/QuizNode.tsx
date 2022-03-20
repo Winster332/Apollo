@@ -187,12 +187,8 @@ export class QuizNode extends Node {
 				borderBottom: '1px solid rgb(18 23 28 / 30%)',
 			}}>
 				<Box p={1}>
-					<Typography style={{
-						fontWeight: 600,
-						color: '#ddd',
-						paddingLeft: '7px'
-					}}>Новый опрос</Typography>
-					<Subtitle>Вопрос</Subtitle>
+					<TgTitle>Новый опрос</TgTitle>
+					<TgSubtitle>Вопрос</TgSubtitle>
 					<input
 						placeholder='Задайте вопрос'
 						onChange={(e) => store.question = e.target.value}
@@ -219,7 +215,7 @@ export class QuizNode extends Node {
 				borderBottom: '1px solid rgb(18 23 28 / 30%)',
 			}}>
 				<Box p={1}>
-					<Subtitle>Варианты ответа</Subtitle>
+					<TgSubtitle>Варианты ответа</TgSubtitle>
 					<Box>
 						{store.items.map((item, idx) =>
 							<QuizItemView 
@@ -255,7 +251,7 @@ export class QuizNode extends Node {
 				borderTop: '1px solid rgb(18 23 28 / 30%)',
 			}}>
 				<Box p={1}>
-					<Subtitle>Настройки</Subtitle>
+					<TgSubtitle>Настройки</TgSubtitle>
 					<Box pl={1}>
 						<FormControlLabel
 							control={
@@ -285,7 +281,7 @@ export class QuizNode extends Node {
 			</Grid>
 			{store.quizMode && <Grid item xs={12}>
 				<Box p={1}>
-					<Subtitle>Объяснение</Subtitle>
+					<TgSubtitle>Объяснение</TgSubtitle>
 					<input
 						placeholder='Добавить комментарий (необязательно)'
 						onChange={(e) => store.answer = e.target.value}
@@ -314,8 +310,8 @@ export class QuizNode extends Node {
 					marginLeft: 'auto',
 					display: 'flex'
 				}}>
-					<Button><Subtitle style={{fontSize: '13px', margin: '0px'}}>Отмена</Subtitle></Button>
-					<Button><Subtitle style={{fontSize: '13px', margin: '0px'}}>Создать</Subtitle></Button>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Отмена</TgSubtitle></Button>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Создать</TgSubtitle></Button>
 				</Box>
 			</Grid>
 		</Grid>;
@@ -385,12 +381,22 @@ const Speech = styled(Box)`
     user-select: none;
 `
 
-const Subtitle = styled(Typography)`
+export const TgTitle = styled(Typography)`
+	fontWeight: 600,
+	color: '#ddd',
+	paddingLeft: '7px'
+`
+
+export const TgSubtitle = styled(Typography)`
 	font-weight: 600;
 	color: #5ab3ff;
 	font-size: 14px;
 	margin-top: 7px;
 	padding-left: 6px;
+`
+export const TgLabel = styled("div")`
+	font-size: 14px;
+	color: '#4a5d74'
 `
 
 const QuizItem = styled('div')`
