@@ -62,13 +62,13 @@ export class EditorStore {
 		const mb = byte * byte;
 		
 		if (bytes <= mb) {
-			return `${(bytes / byte).toFixed(1)} МБ`
+			return `${(bytes / byte).toFixed(1)} КБ`
 		}
 		
 		const gb = mb * bytes;
 
 		if (bytes <= gb) {
-			return `${(bytes / mb).toFixed(1)} ГБ`
+			return `${(bytes / mb).toFixed(1)} МБ`
 		}
 		
 		return 'Размер неизвестен'

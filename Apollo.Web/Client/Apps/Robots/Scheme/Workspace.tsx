@@ -11,7 +11,6 @@ import {SwitchNode} from "./Tools/SwitchNode";
 import {SpeechNode} from "./Tools/SpeechNode";
 import {CommandNode} from "./Tools/CommandNode";
 import {ExtractDataNode} from "./Tools/ExtractDataNode";
-import {UserActionNode} from "./Tools/UserActionNode";
 import {LogicNode} from "./Tools/LogicNode";
 import {TextNode} from "./Tools/Message/TextNode";
 import {QuizNode} from "./Tools/Quiz/QuizNode";
@@ -21,6 +20,7 @@ import {HttpRequestNode} from "./Tools/Http/HttpRequestNode";
 import {ButtonsNode} from "./Tools/Buttons/ButtonsNode";
 import {StartBotNode} from "./Tools/Start/StartBotNode";
 import {TimerNode} from "./Tools/Timer/TimerNode";
+import {UserActionNode} from "./Tools/UserAction/UserActionNode";
 
 export enum PipelineDebugState {
 	Running,

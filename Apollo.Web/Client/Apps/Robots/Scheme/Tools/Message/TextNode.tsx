@@ -17,7 +17,6 @@ export class TextNode extends Node {
 		makeObservable(this);
 
 		this.id = Node.generateGuid();
-		this.outputs = [];
 		this.editor = this.renderEditor;
 		this.refInner = React.createRef<HTMLDivElement>();
 		this.refOuter = React.createRef<HTMLDivElement>();
@@ -25,62 +24,9 @@ export class TextNode extends Node {
 
 	private refInner: React.RefObject<HTMLDivElement>;
 	private refOuter: React.RefObject<HTMLDivElement>;
-	public addOutput = (name: string, number: number) => {
-		const id = Node.generateGuid();
-		this.outputs.push(({
-			id: id,
-			name: name,
-			value: number,
-
-			getPosition: () => {
-				const e = document.getElementById(`${this.id}-${id}`);
-				if (e === null) {
-					return null;
-				}
-
-				const item = e.children.item(1);
-
-				if (item === null) {
-					return null;
-				}
-
-				const pos = this.getOffset(item as HTMLElement)
-
-				return ({
-					x: pos.x+5,
-					y: pos.y-14
-				})
-			}
-		}))
-
-		return this;
-	};
-
+	
 	@observable
-	public outputs: ({
-		id: string;
-		name: string;
-		value: number,
-		getPosition: () => (({
-			x: number,
-			y: number;
-		}) | null);
-	})[];
-
-	public getInputPosition = () => {
-		const e = document.getElementById(`${this.id}-input`);
-
-		if (e === null) {
-			return null;
-		}
-
-		const pos = this.getOffset(e);
-
-		return ({
-			x: pos.x+5,
-			y: pos.y+8
-		})
-	};
+	public text: string = '';
 
 	private open = () => {
 		if (this.onOpen) {
