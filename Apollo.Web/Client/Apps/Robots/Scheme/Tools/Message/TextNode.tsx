@@ -2,13 +2,14 @@ import {makeObservable, observable} from "mobx";
 import * as React from "react";
 import {Node} from "../Node"
 import styled from "styled-components";
-import {Box, ButtonGroup, Grid, IconButton} from "@material-ui/core";
+import {Box, Button, Grid} from "@material-ui/core";
 import {Workspace} from "../../Workspace";
 import TextFieldsIcon from '@material-ui/icons/TextFields';
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import DeleteIcon from "@material-ui/icons/Delete";
 import {ConnectorInner, ConnectorOuter} from "../Start/StartBotNode";
+import {TgSubtitle, TgTitle} from "../Quiz/QuizNode";
+import {EditorStore} from "./EditorStore";
+import {observer} from "mobx-react-lite";
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 export class TextNode extends Node {
 	constructor(ws: Workspace, x: number, y: number) {
@@ -17,10 +18,13 @@ export class TextNode extends Node {
 		makeObservable(this);
 
 		this.id = Node.generateGuid();
+		this.editorStore = new EditorStore();
 		this.editor = this.renderEditor;
 		this.refInner = React.createRef<HTMLDivElement>();
 		this.refOuter = React.createRef<HTMLDivElement>();
 	}
+	
+	private editorStore: EditorStore;
 
 	private refInner: React.RefObject<HTMLDivElement>;
 	private refOuter: React.RefObject<HTMLDivElement>;
@@ -131,45 +135,147 @@ export class TextNode extends Node {
 	};
 
 	private renderEditor = () => {
-		return <Grid container xs={12} spacing={2}>
-			<Grid item xs={12}>
-				{/*<TextField*/}
-				{/*	label='Название'*/}
-				{/*	fullWidth*/}
-				{/*	value={this.name} onChange={e => {*/}
-				{/*	this.name = (e.target.value as string);*/}
-				{/*}} />*/}
-			</Grid>
-			<Grid item xs={12}>
-				<Box>
-					{/*<Button onClick={() => this.recordToggle()} style={{minWidth: '0px'}}>*/}
-					{/*	{!this.isRecord ? <FiberSmartRecordIcon/> : <FiberManualRecordIcon style={{fill: '#ff4242'}}/>}*/}
-					{/*</Button>*/}
+		const store = this.editorStore;
+		console.log(store)
+		
+		return <Grid container xs={12} spacing={1}>
+			<TextEditContextMenu store={store.textEditContextMenuStore}/>
+			
+			<Grid item xs={12} style={{
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<TgTitle>Отправка сообщения</TgTitle>
 				</Box>
 			</Grid>
-			<Grid item xs={12} container>
-				<Grid item xs={10}>
-					{/*<VoiceControl src={'https://www.w3schools.com/jsref/horse.mp3'}/>*/}
-				</Grid>
-				<Grid item xs={2}>
-					<Box style={{display: 'flex'}}>
-						<ButtonGroup style={{marginLeft: '4px'}}>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowUpwardIcon fontSize='small'/>
-							</IconButton>
-							<IconButton size='small' style={{minWidth: '0px'}}>
-								<ArrowDownwardIcon fontSize='small'/>
-							</IconButton>
-						</ButtonGroup>
-						<IconButton size='small' style={{marginLeft: 'auto'}}>
-							<DeleteIcon fontSize='small'/>
-						</IconButton>
+			{/*<Grid item xs={12} style={{*/}
+			{/*	background: '#213144'*/}
+			{/*}}>*/}
+			{/*	<Box style={{padding: '2px'}}></Box>*/}
+			{/*</Grid>*/}
+			<Grid item xs={12} style={{
+				borderTop: '1px solid rgb(18 23 28 / 30%)',
+				borderBottom: '1px solid rgb(18 23 28 / 30%)',
+			}}>
+				<Box p={1}>
+					<TgSubtitle>Сообщение</TgSubtitle>
+					<Box pl={1}>
+						<div onContextMenu={e => {
+							console.log(e)
+							// const pos = this.getOffset(e.target as HTMLElement);
+							store.textEditContextMenuStore.open(e.clientX, e.clientY)
+							
+							e.preventDefault()
+						}} contentEditable
+							style={{
+								height: '51px',
+								width: '100%',
+								resize: 'none',
+								border: 'none',
+								color: '#ddd',
+								background: 'transparent',
+								outline: 'none',
+								overflowY: 'auto'
+							}}
+							></div>
+							{/*value={store.message} onChange={(e) => store.message = e.target.value as string}*/}
 					</Box>
-				</Grid>
+				</Box>
+			</Grid>
+			<Grid item xs={12} style={{
+				display: 'flex'
+			}}>
+				<Box p={1} style={{
+					marginLeft: 'auto',
+					display: 'flex'
+				}}>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Отмена</TgSubtitle></Button>
+					<Button><TgSubtitle style={{fontSize: '13px', margin: '0px'}}>Создать</TgSubtitle></Button>
+				</Box>
 			</Grid>
 		</Grid>;
 	};
 }
+
+export class TextEditContextMenuStore {
+	constructor() {
+		makeObservable(this)
+	}
+	
+	@observable
+	public pos: ({ x: number, y: number }) | null = null
+	
+	public open = (x: number, y: number) => {
+		this.pos = ({
+			x: x,
+			y: y
+		})
+	};
+	
+	public close = () => {
+		this.pos = null;
+	};
+}
+
+const TextEditContextMenu = observer((props: ({
+	store: TextEditContextMenuStore;
+})) => {
+	const store = props.store;
+	
+	if (store.pos === null) {
+		return <></>
+	}
+	
+	const menuItem = (label: string, aa?: boolean) => {
+		return <ContextMenuItem>
+			<span>{label}</span>
+			{aa === true &&
+			<Box>
+				<ArrowRightIcon/>
+			</Box>}
+		</ContextMenuItem>
+	};
+	
+	return <>
+		<div onClick={() => store.close()} style={{
+			position: 'absolute',
+			zIndex: 2,
+			left: '0px',
+			top: '0px',
+			width: '100%',
+			height: '100%'
+		}}/>
+		<Box style={{
+			zIndex: 3,
+			userSelect: 'none',
+			position: 'absolute',
+			background: '#101922',
+			padding: '7px 0px',
+			left: `${store.pos.x - 670}px`,
+			top: `${store.pos.y - 244}px`,
+		}}>
+			<div>
+				{menuItem('Жирный')}
+				{menuItem('Курсив')}
+				{menuItem('Подчеркнутый')}
+				{menuItem('Зачеркнутый')}
+				{menuItem('Моноширный')}
+				{menuItem('Добавить ссылку')}
+			</div>
+		</Box>
+	</>
+});
+
+const ContextMenuItem = styled('div')`
+	padding: 3px 7px;
+    color: #dddddde8;
+	transition: 0.1s;
+	cursor: pointer;
+
+	&:hover {
+		background: #ffffff12;
+	}
+`
 
 const TextMonospace = styled('span')`
 	color: #547699;

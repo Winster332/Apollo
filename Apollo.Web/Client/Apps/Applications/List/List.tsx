@@ -30,7 +30,7 @@ import {ISortQuery, SortQueryType} from "@Shared/Contracts";
 // import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import {CommonStore} from "@Layout";
 import {AppTheme} from "../../../Layout/CommonStore";
-import GetAppIcon from "@material-ui/icons/GetApp";
+// import GetAppIcon from "@material-ui/icons/GetApp";
 
 const HoverTableRow = styled(TableRow)`
 	background: transparent;
@@ -210,27 +210,27 @@ export const FlexTable = observer((props: ({
 		<StickTableFooter style={{background: CommonStore.instance.theme.current === AppTheme.Dark ? '#303030' : '#fff'}}>
 			<TableRow>
 				<TableCell colSpan={props.header.length+1}>
-					<Box style={{display: 'flex'}}>
-						<FlexTablePagination pagination={pagination}/>
-
-						<Button variant='contained' color='primary' style={{marginLeft: 'auto'}} onClick={() => props.onImport()}>
-							{/*store.downloadReport()*/}
-							<GetAppIcon/>
-						</Button>
-					</Box>
-					{/*<TablePagination*/}
-					{/*	rowsPerPageOptions={pagination.rowsPerPageOptions}*/}
-					{/*	component="div"*/}
-					{/*	count={pagination.totalRows}*/}
-					{/*	rowsPerPage={pagination.currentRowsPerPage}*/}
-					{/*	page={pagination.currentPage}*/}
-					{/*	onPageChange={(e, newPage) => {*/}
-					{/*		if (e) {*/}
-					{/*			pagination.changedPage(newPage);*/}
-					{/*		}*/}
-					{/*	}}*/}
-					{/*	onRowsPerPageChange={(e) => pagination.changedRowsPerPage(parseInt(e.target.value, 10))}*/}
-					{/*/>*/}
+					{/*<Box style={{display: 'flex'}}>*/}
+					{/*	<FlexTablePagination pagination={pagination}/>*/}
+					
+					{/*	<Button variant='contained' color='primary' style={{marginLeft: 'auto'}} onClick={() => props.onImport()}>*/}
+					{/*		/!*store.downloadReport()*!/*/}
+					{/*		<GetAppIcon/>*/}
+					{/*	</Button>*/}
+					{/*</Box>*/}
+					<TablePagination
+						rowsPerPageOptions={pagination.rowsPerPageOptions}
+						component="div"
+						count={pagination.totalRows}
+						rowsPerPage={pagination.currentRowsPerPage}
+						page={pagination.currentPage}
+						onPageChange={(e, newPage) => {
+							if (e) {
+								pagination.changedPage(newPage);
+							}
+						}}
+						onRowsPerPageChange={(e) => pagination.changedRowsPerPage(parseInt(e.target.value, 10))}
+					/>
 				</TableCell>
 			</TableRow>
 		</StickTableFooter>

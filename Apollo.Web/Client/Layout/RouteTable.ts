@@ -114,13 +114,13 @@ export class RouteTable {
 			),
 			new RouteGroup(
 				'Боты',
-				true,
+				false,
 				RobotController.list()
-					.route('Роботы', true),
+					.route('Роботы', false),
 				RobotController.scheme()
 					.route('Схема', false),
 				CallCenterController.maker()
-					.route('Конструктор', true),
+					.route('Конструктор', false),
 			),
 			new RouteGroup(
 				'Настройки',
