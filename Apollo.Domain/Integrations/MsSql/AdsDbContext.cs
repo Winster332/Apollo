@@ -27,10 +27,19 @@ namespace Apollo.Domain.Integrations.MsSql
 		
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
+// 			if (!optionsBuilder.IsConfigured)
+// 			{
+// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+// 				optionsBuilder.UseSqlServer(_connectionString);
+// 			}
 			if (!optionsBuilder.IsConfigured)
 			{
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-				optionsBuilder.UseSqlServer(_connectionString);
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+//				optionsBuilder.UseSqlServer(_connectionString);
+
+				var localConnectionString = "Server=DESKTOP-Q6M5SJP\\SQLEXPRESS;User Id=DESKTOP-Q6M5SJP\\admin;Integrated security=SSPI;database=adsreg1";
+				optionsBuilder.UseSqlServer(localConnectionString);
+
 			}
 		}
 
