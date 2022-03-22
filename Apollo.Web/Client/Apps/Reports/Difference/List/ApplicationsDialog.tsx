@@ -22,7 +22,7 @@ import {Pagination} from "../../../Addresses/List/Store";
 import dayjs from "dayjs";
 import DayJsUtils from "@date-io/dayjs";
 import {Router} from "@Shared/Router";
-import {DatePickerRange} from "@Shared/DatePicker";
+import {DateTimePicker} from "@Shared/DatePicker";
 import {CommonStore} from "@Layout";
 
 export class ApplicationsDialogStore {
@@ -202,17 +202,29 @@ export const ApplicationsDialog = observer((props: ({
 					<TableRow>
 						<TableCell colSpan={4}>
 							<Box style={{display: 'flex'}}>
-								<DatePickerRange
-									label='Промежуток'
-									valueFrom={store.filter.from}
-									valueTo={store.filter.to}
-									onChange={(valFrom, valTo) => {
-										if (valFrom !== null && valTo !== null) {
-											store.filter.from = valFrom;
-											store.filter.to = valTo;
+								<DateTimePicker
+									value={store.filter.from}
+									label='С'
+									style={{marginRight: '10px'}}
+									onChange={val => {
+										if (val) {
+											if (store.filter.from.format('DD.MM.YYYY hh:ss') !== val.format('DD.MM.YYYY hh:ss')) {
+												store.filter.from = val;
+												store.refresh();
+											}
 										}
-									}}
-								/>
+									}}/>
+								<DateTimePicker
+									value={store.filter.to}
+									label='По'
+									onChange={val => {
+										if (val) {
+											if (store.filter.to.format('DD.MM.YYYY hh:ss') !== val.format('DD.MM.YYYY hh:ss')) {
+												store.filter.to = val;
+												store.refresh();
+											}
+										}
+									}}/>
 							</Box>
 						</TableCell>
 						<TableCell colSpan={3}>
